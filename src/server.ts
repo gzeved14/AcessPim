@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
-import { appDataSource } from './src/db/appDataSource.js';
-import routes from './src/routes/index.js';
+import { appDataSource } from './db/appDataSource.js';
+import routes from './routes/index.js';
 import { errorHandler } from './src/middlewares/errorHandler.js';
 import express from 'express';
 import 'reflect-metadata';
