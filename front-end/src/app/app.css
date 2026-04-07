@@ -1,0 +1,11 @@
+.box-1{
+    height: 100px;
+    width: 100px;
+    background-color: var(--primary);
+}
+
+.box-2{
+    height: 100px;
+    width: 100px;
+    background-color: green;
+}
