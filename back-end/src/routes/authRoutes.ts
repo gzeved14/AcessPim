@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { appDataSource } from '../config/appDataSource.js';
 import AuthController from '../controllers/AuthController.js';
 import { AuthService } from '../services/AuthService.js';
-import { validateBody } from '../middlewares/validateBody.js';
+import { validateBody } from '../middleware/validateBody.js';
 import { loginSchema, refreshSchema, logoutSchema} from '../dtos/AuthDTO.js';
 
 const router = Router(); //adiciona rotas nesse router para depois exportar e usar no index.ts

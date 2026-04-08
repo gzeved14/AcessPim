@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { appDataSource } from '../config/appDataSource.js';
-import { validateBody } from '../middlewares/validateBody.js';
+import { validateBody } from '../middleware/validateBody.js';
 import AcessoController from '../controllers/AcessoController.js';
-import AcessoService from '../services/AcessoService.js';
+import { AcessoService } from '../services/AcessoService.js';
 import { createRegistroSchemaDTO, updateRegistroSchemaDTO } from '../dtos/CreateRegistroSchemaDTO.js';
 
 const acessoRoutes = Router();

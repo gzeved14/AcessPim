@@ -18,7 +18,7 @@ export class AcessoService {
         this.autorizacaoRepo = dataSource.getRepository(Autorizacao);
     }
 
-    async registarAcesso(dados: {
+    async registrarAcesso(dados: {
         colaborador_id: string;
         area_id: string;
         tipo: 'entrada' | 'saida';
