@@ -24,8 +24,8 @@ export class RegistroAcesso {
     @Column({ type: 'boolean', nullable: false })
     autorizado!: boolean;
 
-    @CreateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })
-    registrado_em!: Date;
+    @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+    timestamp!: Date;
     
     @ManyToOne(() => Usuario, (usuario) => usuario.registros_realizados)
     @JoinColumn({ name: 'registrado_por' }) // Nome da coluna no banco PostgreSQL
