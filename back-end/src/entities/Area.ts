@@ -12,7 +12,7 @@ export class Area{
     @Column({ type: 'text', nullable: false })
     nome!: string;
 
-    @Column({ type: 'text', nullable: false})
+    @Column({ type: 'text', nullable: true})
     descricao!: string;
 
     @Column({ type: 'text', enum: Nivel_Risco, nullable: false })

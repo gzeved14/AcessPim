@@ -3,7 +3,7 @@ import { compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Usuario } from "../entities/Usuario.js"; 
 import { AppError } from "../errors/AppError.js";
-
+import { TokenBlacklistService } from "../services/TokenBlacklistService.js"
 
 interface LoginMeta {
     ip: string;
@@ -12,83 +12,87 @@ interface LoginMeta {
 
 export class AuthService {
     private userRepo: Repository<Usuario>;
+    private tokenBlacklistService: TokenBlacklistService;
 
     constructor(dataSource: DataSource) {
         this.userRepo = dataSource.getRepository(Usuario);
+        this.tokenBlacklistService = new TokenBlacklistService(dataSource);
     }
 
-    private gerarAccessToken(usuario: Usuario): string {
+    private generateAccessToken(user: Usuario): string {
         return jwt.sign(
             { 
-                sub: usuario.id, 
-                email: usuario.email, 
-                cargo: usuario.cargo 
+                sub: user.id, 
+                email: user.email, 
+                cargo: user.cargo 
             },
             process.env.JWT_ACCESS_SECRET!,
             { expiresIn: "8h" } //
         );
     }
 
-    /**
-     * Gera um Refresh Token com validade extendida (ex: 7 dias).
-     */
-    private gerarRefreshToken(usuario: Usuario): string {
+   
+    private generateRefreshToken(user: Usuario): string {
         return jwt.sign(
-            { sub: usuario.id },
+            { sub: user.id },
             process.env.JWT_REFRESH_SECRET!,
             { expiresIn: "7d" }
         );
     }
 
-    /**
-     * Lógica de Login: valida credenciais e gera tokens.
-     */
-    async login(email: string, senha: string, meta: LoginMeta) {
+
+    async login(email: string, password: string, meta: LoginMeta) {
         // Busca o usuário. O select garante que a senha_hash venha na query
-        const usuario = await this.userRepo.findOne({
+        const user = await this.userRepo.findOne({
             where: { email },
             select: ["id", "nome", "email", "senha_hash", "cargo"] 
         });
 
-        if (!usuario) {
-            throw new AppError("Credenciais inválidas", 401); //
+        if (!user) {
+            throw new AppError("Credenciais inválidas", 401); 
         }
 
-        // RNF 02: Comparação de hash segura
-        const senhaCorreta = await compare(senha, usuario.senha_hash);
-        if (!senhaCorreta) {
+        const isPasswordValid = await compare(password, user.senha_hash);
+        if (!isPasswordValid) {
             throw new AppError("Credenciais inválidas", 401);
         }
 
-        console.log(`Usuário ${usuario.email} logado do IP: ${meta.ip} usando ${meta.userAgent}`);
+        console.log(`Usuário ${user.email} logado do IP: ${meta.ip} usando ${meta.userAgent}`);
         
-        const accessToken = this.gerarAccessToken(usuario);
-        const refreshToken = this.gerarRefreshToken(usuario);
+        const accessToken = this.generateAccessToken(user);
+        const refreshToken = this.generateRefreshToken(user);
 
         return { 
             accessToken, 
             refreshToken, 
             usuario: {
-                id: usuario.id,
-                nome: usuario.nome,
-                email: usuario.email,
-                cargo: usuario.cargo
+                id: user.id,
+                nome: user.nome,
+                email: user.email,
+                cargo: user.cargo
             }
         };
     }
 
-    /**
-     * Invalidação de Refresh Token (Logout)
-     * No MVP básico, o logout limpa o token no frontend. 
-     * Para trios, pode-se implementar blacklist no banco.
-     */
-    async logout(refreshToken: string) {
-        if (!refreshToken) {
-        return;
+    private async blacklistToken(token?: string): Promise<void> {
+        if (!token) {
+            return;
         }
+
+        const decoded = jwt.decode(token) as { exp?: number } | null;
+        if (!decoded?.exp) {
+            return;
+        }
+
+        const expiresAt = new Date(decoded.exp * 1000);
+        await this.tokenBlacklistService.add(token, expiresAt);
+    }
+
+    async logout(tokens: { refreshToken?: string; accessToken?: string }) {
         try {
-            jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
-            console.log("Sessão encerada com sicesso.");
+            await this.blacklistToken(tokens.refreshToken);
+            await this.blacklistToken(tokens.accessToken);
+            console.log("Sessão encerrada com sucesso.");
         } catch (error){
             console.error("Erro ao processar logout no servidor:", error);
         }
@@ -97,17 +101,30 @@ export class AuthService {
     async refresh(refreshToken: string) {
         try {
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
-            const usuario = await this.userRepo.findOneBy({ id: decoded.sub as string });
+            const user = await this.userRepo.findOneBy({ id: decoded.sub as string });
             
-            if (!usuario) 
+            if (!user) 
                 throw new AppError("Usuário não encontrado", 404);
             return{
-                accessToken: this.gerarAccessToken(usuario),
-                refreshToken: this.gerarRefreshToken(usuario)
+                accessToken: this.generateAccessToken(user),
+                refreshToken: this.generateRefreshToken(user)
 
             };
         } catch {
             throw new AppError("Token inválido", 401);
         }
+    }
+
+    async findAllUser() {
+        return this.userRepo.find({
+            select: ["id", "nome", "matricula", "email", "setor", "cargo", "criado_em"]
+        });
+    }
+
+    async findUserById(id: string) {
+        return this.userRepo.findOne({
+            where: { id },
+            select: ["id", "nome", "matricula", "email", "setor", "cargo", "criado_em"]
+        });
     }
 }

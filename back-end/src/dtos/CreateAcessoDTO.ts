@@ -1,9 +1,0 @@
-import { z } from "zod";
-
-export const createAcessoSchema = z.object({
-    colaborador_id: z.string().uuid(),
-    area_id: z.string().uuid(),
-    tipo: z.enum(['entrada', 'saida']),
-    registrado_por: z.string().uuid(),
-    observacao: z.string().optional().nullable()
-});

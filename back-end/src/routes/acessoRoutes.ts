@@ -3,18 +3,18 @@ import { appDataSource } from '../config/appDataSource.js';
 import { validateBody } from '../middleware/validateBody.js';
 import AcessoController from '../controllers/AcessoController.js';
 import { AcessoService } from '../services/AcessoService.js';
-import { createRegistroSchemaDTO, updateRegistroSchemaDTO } from '../dtos/CreateRegistroSchemaDTO.js';
+import { createAccessRecordSchema, updateAccessRecordSchema } from '../dtos/CreateRegistroSchemaDTO.js';
+import { ensureAuth } from '../middleware/authMiddleware.js'
+const accessRoutes = Router();
 
-const acessoRoutes = Router();
+const accessService = new AcessoService(appDataSource);
+const accessController = new AcessoController(accessService);
 
-const acessoService = new AcessoService(appDataSource);
-const acessoController = new AcessoController(acessoService);
+accessRoutes.use(ensureAuth);
 
+accessRoutes.get("/", accessController.findAll.bind(accessController));
+accessRoutes.post("/", validateBody(createAccessRecordSchema), accessController.create.bind(accessController));
+accessRoutes.put("/:id", validateBody(updateAccessRecordSchema), accessController.update.bind(accessController));
+accessRoutes.delete("/:id", accessController.delete.bind(accessController));
 
-acessoRoutes.get("/", acessoController.findAll.bind(acessoController));
-acessoRoutes.get("/:id", acessoController.findById.bind(acessoController));
-acessoRoutes.post("/", validateBody(createRegistroSchemaDTO), acessoController.create.bind(acessoController));
-acessoRoutes.put("/:id", validateBody(updateRegistroSchemaDTO), acessoController.update.bind(acessoController));
-acessoRoutes.delete("/:id", acessoController.delete.bind(acessoController));
-
-export default acessoRoutes;
+export default accessRoutes;

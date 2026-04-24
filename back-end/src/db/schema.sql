@@ -2,8 +2,8 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Definição de ENUMs conforme o PRD
-CREATE TYPE nivel_risco_enum AS ENUM ('baixo', 'medio', 'alto', 'critico');
-CREATE TYPE tipo_movimento_enum AS ENUM ('entrada', 'saida');
+CREATE TYPE nivel_risco_enum AS ENUM ('BAIXO', 'MEDIO', 'ALTO', 'CRITICO');
+CREATE TYPE tipo_movimento_enum AS ENUM ('ENTRADA', 'SAIDA');
 CREATE TYPE cargo_usuario_enum AS ENUM ('ADMIN', 'GESTOR_DE_AREA', 'OP_DE_SEGURANCA');
 
 -- Tabela de Usuários (Quem opera o sistema)

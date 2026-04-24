@@ -10,28 +10,27 @@ export class RegistroAcesso {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
-    @ManyToOne(() => Colaborador, (colaborador) => colaborador.acessos)
-    @JoinColumn({ name: 'colaborador_id' }) // Nome da coluna no banco PostgreSQL
+    @ManyToOne(() => Colaborador)
+    @JoinColumn({ name: 'colaborador_id' })
     colaborador!: Colaborador;
 
-    @ManyToOne(() => Area, (area) => area.acesso, { nullable: false })
-    @JoinColumn({ name: 'area_id' }) // Nome da coluna no banco PostgreSQL
+    @ManyToOne(() => Area)
+    @JoinColumn({ name: 'area_id' })
     area!: Area;
 
-    @Column({ type: 'text', enum: Tipo, nullable: false })
+    @Column({ type: 'enum', enum: Tipo })
     tipo!: Tipo;
 
-    @Column({ type: 'boolean', nullable: false })
+    @Column({ type: 'boolean' })
     autorizado!: boolean;
 
     @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
     timestamp!: Date;
-    
-    @ManyToOne(() => Usuario, (usuario) => usuario.registros_realizados)
-    @JoinColumn({ name: 'registrado_por' }) // Nome da coluna no banco PostgreSQL
-    registrado_por!: Colaborador;
+
+    @ManyToOne(() => Usuario)
+    @JoinColumn({ name: 'registrado_por' })
+    registrado_por!: Usuario; // Corrigido para Usuario
 
     @Column({ type: 'text', nullable: true })
     observacao!: string | null;
-    
 }

@@ -1,0 +1,7 @@
+.forbidden {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  text-align: center;
+  gap: 0.5rem;
+}

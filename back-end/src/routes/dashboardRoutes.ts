@@ -5,8 +5,8 @@ import { DashboardService } from '../services/DashboardService.js';
 
 const dashboardRoutes = Router();
 
-const dashboardService = new DashboardService(appDataSource);
-const dashboardController = new DashboardController(dashboardService);
+const analyticsService = new DashboardService(appDataSource);
+const dashboardController = new DashboardController(analyticsService);
 
 dashboardRoutes.get('/', dashboardController.getDashboard.bind(dashboardController));
 

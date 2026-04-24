@@ -8,17 +8,17 @@ import { Autorizacao } from "../entities/Autorizacao.js";
 
 
 export class AcessoService {
-    private acessoRepo: Repository<RegistroAcesso>;
-    private colaboradorRepo: Repository<Colaborador>;
-    private autorizacaoRepo: Repository<Autorizacao>;
+    private accessRepo: Repository<RegistroAcesso>;
+    private collaboratorRepo: Repository<Colaborador>;
+    private authorizationRepo: Repository<Autorizacao>;
 
     constructor(dataSource: DataSource) {
-        this.acessoRepo = dataSource.getRepository(RegistroAcesso);
-        this.colaboradorRepo = dataSource.getRepository(Colaborador);
-        this.autorizacaoRepo = dataSource.getRepository(Autorizacao);
+        this.accessRepo = dataSource.getRepository(RegistroAcesso);
+        this.collaboratorRepo = dataSource.getRepository(Colaborador);
+        this.authorizationRepo = dataSource.getRepository(Autorizacao);
     }
 
-    async registrarAcesso(dados: {
+    async registerAccess(data: {
         colaborador_id: string;
         area_id: string;
         tipo: 'entrada' | 'saida';
@@ -26,61 +26,61 @@ export class AcessoService {
         observacao?: string;
     }) {
         // Implementação do método de registro de acesso
-        const colaborador = await this.colaboradorRepo.findOneBy({ id: dados.colaborador_id});
-        if (!colaborador || !colaborador.ativo){
+        const collaborator = await this.collaboratorRepo.findOneBy({ id: data.colaborador_id});
+        if (!collaborator || !collaborator.ativo){
             throw new AppError("Colaborador inexistente ou inativo", 400);
         }
 
-        const permissao = await this.autorizacaoRepo.findOne({
+        const permission = await this.authorizationRepo.findOne({
             where: {
-                colaborador_id: dados.colaborador_id,
-                area_id: dados.area_id,
-                cargo_permitido: colaborador.cargo
+                colaborador_id: data.colaborador_id,
+                area_id: data.area_id,
+                cargo_permitido: collaborator.cargo
             }
         });
 
-        const autorizado = !!permissao;
+        const isAuthorized = !!permission;
 
-        if (!autorizado && dados.tipo === 'entrada' && !dados.observacao) {
+        if (!isAuthorized && data.tipo === 'entrada' && !data.observacao) {
             throw new AppError("É obrigatório informar uma observação para acessos negados.", 400);
     }
 
-        const tipoAcesso = dados.tipo === "entrada" ? Tipo.ENTRADA : Tipo.SAIDA;
+        const accessType = data.tipo === "entrada" ? Tipo.ENTRADA : Tipo.SAIDA;
 
-        const novoAcesso = this.acessoRepo.create({
-            colaborador: { id: dados.colaborador_id } as Colaborador,
-            area: { id: dados.area_id } as Area,
-            tipo: tipoAcesso,
-            autorizado: autorizado,
-            registrado_por: { id: dados.registrado_por } as any,
-            observacao: dados.observacao || null
+        const newAccess = this.accessRepo.create({
+            colaborador: { id: data.colaborador_id } as Colaborador,
+            area: { id: data.area_id } as Area,
+            tipo: accessType,
+            autorizado: isAuthorized,
+            registrado_por: { id: data.registrado_por } as any,
+            observacao: data.observacao || null
             
         });
-        return await this.acessoRepo.save(novoAcesso);
+        return await this.accessRepo.save(newAccess);
     }
 
-    async listarHistorico(filtros: {
+    async listHistory(filters: {
         dataInicio?: string;
         dataFim?: string;
         area_id?: string;
         colaborador_id?: string;
     }){
-        const query = this.acessoRepo.createQueryBuilder("acesso")
-            .leftJoinAndSelect("acesso.colaborador", "colaborador")
-            .leftJoinAndSelect("acesso.area", "area")
-            .orderBy("acesso.timestamp", "DESC");
+        const query = this.accessRepo.createQueryBuilder("access")
+            .leftJoinAndSelect("access.colaborador", "collaborator")
+            .leftJoinAndSelect("access.area", "area")
+            .orderBy("access.timestamp", "DESC");
 
-        if (filtros.area_id){
-            query.andWhere("acesso.area_id = :area_id", { area_id: filtros.area_id });
+        if (filters.area_id){
+            query.andWhere("access.area_id = :area_id", { area_id: filters.area_id });
         }
 
-        if (filtros.colaborador_id){
-            query.andWhere("acesso.colaborador_id = :colaborador_id", { colaborador_id: filtros.colaborador_id });
+        if (filters.colaborador_id){
+            query.andWhere("access.colaborador_id = :colaborador_id", { colaborador_id: filters.colaborador_id });
         }
-        if (filtros.dataInicio && filtros.dataFim) {
-            query.andWhere("acesso.timestamp BETWEEN :inicio AND :fim", {
-                inicio: filtros.dataInicio,
-                fim: filtros.dataFim
+        if (filters.dataInicio && filters.dataFim) {
+            query.andWhere("access.timestamp BETWEEN :start AND :end", {
+                start: filters.dataInicio,
+                end: filters.dataFim
             });
         } 
         return await query.getMany();
