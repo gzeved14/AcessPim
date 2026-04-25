@@ -27,10 +27,11 @@ export const ensureAuth: RequestHandler = async (req, res, next) => {
     }
 
     try {
-        const isRevoked = await blacklistService.isBlacklisted(token); // Antes de validar o token, o sistema consulta o blacklistService para ver se aquele token específico foi revogado ->(invalidado) (em um logout anterior).
-        if (isRevoked){
-            return next(new AppError("Sessão encerrada. Faça login novamente.", 401)); //Este erro sinaliza ao frontend Angular que o usuário deve ser redirecionado imediatamente para a tela de Login
-        }  // Se o token estiver na lista negra, a requisição é negada com erro 401, mesmo que o token ainda esteja dentro da validade de 8 horas. Isso cumpre o requisito de invalidação de sessão do plano de integridade de dados.
+        const isRevoked = await blacklistService.isBlacklisted(token); // Antes de validar o token, o sistema consulta a blacklist para bloquear sessões revogadas.
+        if (isRevoked) {
+            return next(new AppError("Sessão encerrada. Faça login novamente.", 401));
+        }
+
         const payload = jwt.verify(token, getAccessSecret()) as JwtPayload; // jwt.verify: Utiliza a chave secreta (vinda de variáveis de ambiente) para garantir que o token é autêntico e não foi alterado.
         (req as any).auth = payload; // Ao validar com sucesso, o conteúdo do token (ID do operador, e-mail, cargo) é anexado ao objeto da requisição. Isso permite que o AcessoController saiba exatamente qual operador está realizando o registro (campo registrado_por).
         return next();

@@ -1,3 +1,26 @@
 .page {
   padding: 2rem;
 }
+
+.feedback {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.feedback.error {
+  color: #b91c1c;
+}
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #ffffff;
+}
+
+.list-table th,
+.list-table td {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem;
+}

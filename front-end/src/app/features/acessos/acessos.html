@@ -1,4 +1,78 @@
 <main class="page">
-  <h1>Acessos</h1>
-  <p>Pagina base da feature de acessos.</p>
+  <!-- Cabecalho da tela com atalho para novo registro -->
+  <div class="header-row">
+    <h1>Acessos</h1>
+    <button type="button" (click)="goToRegistrar()">Novo registro</button>
+  </div>
+
+  <!-- Filtros de periodo usados para consulta do historico -->
+  <form class="filters" (ngSubmit)="onFilter()">
+    <label>
+      Data inicial
+      <input type="date" name="dataInicio" [(ngModel)]="dataInicio" />
+    </label>
+
+    <label>
+      Data final
+      <input type="date" name="dataFim" [(ngModel)]="dataFim" />
+    </label>
+
+    <label>
+      ID da area
+      <input type="text" name="areaId" [(ngModel)]="areaId" placeholder="UUID da area" />
+    </label>
+
+    <label>
+      ID do colaborador
+      <input
+        type="text"
+        name="colaboradorId"
+        [(ngModel)]="colaboradorId"
+        placeholder="UUID do colaborador"
+      />
+    </label>
+
+    <div class="actions">
+      <button type="submit">Filtrar</button>
+      <button type="button" class="secondary" (click)="clearFilter()">Limpar</button>
+    </div>
+  </form>
+
+  <!-- Mensagem amigavel de erro de consulta -->
+  @if (errorMessage()) {
+    <p class="feedback error">{{ errorMessage() }}</p>
+  }
+
+  <!-- Loading, empty state e tabela de resultados -->
+  @if (loading()) {
+    <p class="feedback">Carregando historico de acessos...</p>
+  } @else if (records().length === 0) {
+    <p class="feedback">
+      Nenhum registro foi encontrado para os filtros informados.
+    </p>
+  } @else {
+    <!-- Tabela de historico retornado pela API -->
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Colaborador</th>
+          <th>Area</th>
+          <th>Tipo</th>
+          <th>Autorizado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of records(); track record.id) {
+          <tr>
+            <td>{{ record.timestamp | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ record.colaborador?.nome || '-' }}</td>
+            <td>{{ record.area?.nome || '-' }}</td>
+            <td>{{ record.tipo || '-' }}</td>
+            <td>{{ record.autorizado ? 'Sim' : 'Nao' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </main>

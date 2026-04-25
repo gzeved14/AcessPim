@@ -1,4 +1,35 @@
 <main class="page">
   <h1>Areas</h1>
-  <p>Pagina base da feature de areas.</p>
+
+  <!-- Erro amigavel exibido quando a consulta falha -->
+  @if (errorMessage()) {
+    <p class="feedback error">{{ errorMessage() }}</p>
+  }
+
+  <!-- Feedback de carregamento e estado vazio da listagem -->
+  @if (loading()) {
+    <p class="feedback">Carregando areas...</p>
+  } @else if (areas().length === 0) {
+    <p class="feedback">Nenhuma area cadastrada foi encontrada.</p>
+  } @else {
+    <!-- Tabela principal da listagem de areas -->
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Nivel de risco</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (area of areas(); track area.id) {
+          <tr>
+            <td>{{ area.nome }}</td>
+            <td>{{ area.nivel_risco }}</td>
+            <td>{{ area.ativo ? 'Ativa' : 'Inativa' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </main>

@@ -52,3 +52,11 @@ CREATE TABLE registro_acesso (
     registrado_por UUID NOT NULL REFERENCES usuario(id),
     observacao TEXT NULL
 );
+
+-- Tabela de blacklist de tokens para invalidação de sessão
+CREATE TABLE token_blacklist (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    token TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);

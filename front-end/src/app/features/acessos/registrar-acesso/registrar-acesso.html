@@ -1,0 +1,82 @@
+<main class="page">
+  <!-- Cabecalho da tela de cadastro -->
+  <div class="header-row">
+    <h1>Registrar acesso</h1>
+    <button type="button" class="secondary" (click)="goBack()">Voltar</button>
+  </div>
+
+  <!-- Mensagens de sucesso e erro do envio -->
+  @if (successMessage()) {
+    <p class="feedback success">{{ successMessage() }}</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="feedback error">{{ errorMessage() }}</p>
+  }
+
+  <!-- Loading das opcoes para os selects -->
+  @if (loadingOptions()) {
+    <p class="feedback">Carregando opcoes do formulario...</p>
+  } @else {
+    <!-- Formulario principal de registro de entrada/saida -->
+    <form class="form-grid" (ngSubmit)="onSubmit()">
+      <label>
+        Colaborador
+        <select name="colaboradorId" [(ngModel)]="colaboradorId" required>
+          <option value="" disabled selected>Selecione</option>
+          @for (colaborador of colaboradores(); track colaborador.id) {
+            <option [value]="colaborador.id">
+              {{ colaborador.nome }} - {{ colaborador.matricula }}
+            </option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Area
+        <select name="areaId" [(ngModel)]="areaId" required>
+          <option value="" disabled selected>Selecione</option>
+          @for (area of areas(); track area.id) {
+            <option [value]="area.id">{{ area.nome }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Tipo de movimentacao
+        <select name="tipo" [(ngModel)]="tipo" required>
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saida</option>
+        </select>
+      </label>
+
+      <label>
+        Resultado
+        <select name="resultado" [(ngModel)]="resultado" required>
+          <option value="autorizado">Autorizado</option>
+          <option value="negado">Negado</option>
+        </select>
+      </label>
+
+      @if (showObservacao) {
+        <label class="span-2">
+          Observacao (obrigatoria para negado)
+          <textarea
+            name="observacao"
+            [(ngModel)]="observacao"
+            rows="4"
+            placeholder="Descreva o motivo da negativa"
+            required
+          ></textarea>
+        </label>
+      }
+
+      <div class="actions span-2">
+        <!-- Acao de envio com feedback de estado -->
+        <button type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Salvando...' : 'Salvar registro' }}
+        </button>
+      </div>
+    </form>
+  }
+</main>

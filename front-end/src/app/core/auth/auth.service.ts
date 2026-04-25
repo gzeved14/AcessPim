@@ -24,6 +24,12 @@ interface RefreshResponse {
 	refreshToken: string;
 }
 
+interface SessionPayload {
+	accessToken: string;
+	refreshToken: string;
+	usuario: Usuario;
+}
+
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_KEY = 'authUser';
@@ -71,14 +77,7 @@ export class AuthService {
 					usuario: this.mapAuthUser(res),
 				})),
 				tap((res) => {
-					if (!isPlatformBrowser(this.platformId)) {
-						return;
-					}
-
-					localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken);
-					localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);
-					localStorage.setItem(USER_KEY, JSON.stringify(res.usuario));
-					this.state.set({ usuario: res.usuario, accessToken: res.accessToken });
+					this.persistSession(res);
 				}),
 			);
 	}
@@ -95,18 +94,14 @@ export class AuthService {
 					usuario: this.state().usuario ?? EMPTY_USER,
 				})),
 				tap((res) => {
-					if (!isPlatformBrowser(this.platformId)) {
-						return;
-					}
-
-					localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken);
-					localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);
-					this.state.update((current) => ({
-						...current,
-						accessToken: res.accessToken,
-					}));
+					this.persistSession(res);
 				}),
 			);
+	}
+
+	setSession(session: SessionPayload): void {
+		// Reaproveita a mesma rotina usada pelo refresh para manter a sessao sincronizada.
+		this.persistSession(session);
 	}
 
 	logout(): Observable<void> {
@@ -154,6 +149,18 @@ export class AuthService {
 			matricula: '',
 			setor: '',
 		};
+	}
+
+	private persistSession(session: SessionPayload): void {
+		// O armazenamento em browser nao existe no servidor, então este bloco deve ser ignorado no SSR.
+		if (!isPlatformBrowser(this.platformId)) {
+			return;
+		}
+
+		localStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
+		localStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
+		localStorage.setItem(USER_KEY, JSON.stringify(session.usuario));
+		this.state.set({ usuario: session.usuario, accessToken: session.accessToken });
 	}
 
 	private toPerfil(cargo: string | undefined): Perfil | null {

@@ -1,21 +1,50 @@
 <main class="min-h-screen bg-slate-100 p-4 md:p-8">
   <section class="mx-auto max-w-5xl space-y-6">
+    <!-- Cabecalho com saudacao do usuario autenticado -->
     <header class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p class="text-sm text-slate-500">Painel principal</p>
           <h1 class="text-2xl font-bold text-slate-900">Ola, {{ userName() }}</h1>
         </div>
-        <button
-          type="button"
-          (click)="onLogout()"
-          class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
-        >
-          Sair
-        </button>
       </div>
     </header>
 
+    <!-- Mensagem global de erro (ex.: falha de API) -->
+    @if (errorMessage()) {
+      <section class="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        {{ errorMessage() }}
+      </section>
+    }
+
+    <!-- Cards de indicadores com skeleton enquanto carrega -->
+    <section class="grid gap-4 md:grid-cols-4">
+      @if (loading()) {
+        <article class="card-skeleton"></article>
+        <article class="card-skeleton"></article>
+        <article class="card-skeleton"></article>
+        <article class="card-skeleton"></article>
+      } @else {
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Acessos no dia</p>
+          <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().totalAccessesToday }}</p>
+        </article>
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Negados no dia</p>
+          <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().deniedToday }}</p>
+        </article>
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Pessoas em area</p>
+          <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().collaboratorsNow }}</p>
+        </article>
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <p class="text-sm text-slate-500">Area mais ativa</p>
+          <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().mostActiveArea }}</p>
+        </article>
+      }
+    </section>
+
+    <!-- Atalhos de navegacao para modulos principais -->
     <section class="grid gap-4 md:grid-cols-3">
       <button
         type="button"
@@ -43,6 +72,36 @@
         <h2 class="text-lg font-semibold text-slate-900">Acessos</h2>
         <p class="mt-2 text-sm text-slate-600">Consulte registros e historico de entrada/saida.</p>
       </button>
+    </section>
+
+    <!-- Lista de ultimos acessos com loading e estado vazio -->
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <h2 class="text-lg font-semibold text-slate-900">Ultimos acessos</h2>
+
+      @if (loading()) {
+        <div class="mt-4 flex items-center gap-2 text-sm text-slate-500">
+          <span class="spinner"></span>
+          Carregando acessos recentes...
+        </div>
+      } @else if (latestAccesses().length === 0) {
+        <p class="mt-4 text-sm text-slate-500">
+          Ainda nao existem registros para exibir.
+        </p>
+      } @else {
+        <ul class="mt-4 space-y-2">
+          @for (registro of latestAccesses(); track registro.id) {
+            <li class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700">
+              <strong>{{ registro.colaborador?.nome || 'Colaborador' }}</strong>
+              em
+              <strong>{{ registro.area?.nome || 'Area' }}</strong>
+              - {{ registro.tipo || 'tipo' }}
+              @if (registro.timestamp) {
+                <span class="text-slate-500">({{ registro.timestamp | date: 'dd/MM/yyyy HH:mm' }})</span>
+              }
+            </li>
+          }
+        </ul>
+      }
     </section>
   </section>
 </main>

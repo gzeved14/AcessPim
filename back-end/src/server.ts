@@ -15,6 +15,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:4200', credentials: true }));
+// Garantir UTF-8 em todas as respostas JSON
+app.use((req, res, next) => {
+  res.type('application/json; charset=utf-8');
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,6 +39,17 @@ app.use(errorHandler);
 
 appDataSource.initialize()
     .then(() => {
+    // Garante a tabela usada pela invalidacao de sessão mesmo em bases antigas.
+    return appDataSource.query(`
+      CREATE TABLE IF NOT EXISTS token_blacklist (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        token TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT now()
+      )
+    `);
+  })
+  .then(() => {
         console.log('Database connection established successfully!');
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

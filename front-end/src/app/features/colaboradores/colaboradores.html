@@ -1,4 +1,37 @@
 <main class="page">
   <h1>Colaboradores</h1>
-  <p>Pagina base da feature de colaboradores.</p>
+
+  <!-- Erro amigavel exibido quando a API retorna falha -->
+  @if (errorMessage()) {
+    <p class="feedback error">{{ errorMessage() }}</p>
+  }
+
+  <!-- Loading inicial e empty state quando nao ha resultado -->
+  @if (loading()) {
+    <p class="feedback">Carregando colaboradores...</p>
+  } @else if (colaboradores().length === 0) {
+    <p class="feedback">Nenhum colaborador foi encontrado para a consulta atual.</p>
+  } @else {
+    <!-- Tabela da listagem de colaboradores -->
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Matricula</th>
+          <th>Cargo</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (colaborador of colaboradores(); track colaborador.id) {
+          <tr>
+            <td>{{ colaborador.nome }}</td>
+            <td>{{ colaborador.matricula }}</td>
+            <td>{{ colaborador.cargo }}</td>
+            <td>{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </main>

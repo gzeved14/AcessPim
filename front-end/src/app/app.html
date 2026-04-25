@@ -1,1 +1,7 @@
+<!-- Navbar global exibida apenas em rotas autenticadas. -->
+@if (showNavbar()) {
+	<app-navbar [userName]="userName()" (logout)="onLogout()"></app-navbar>
+}
+
+<!-- Conteudo principal roteado da aplicacao. -->
 <router-outlet></router-outlet>

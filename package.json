@@ -1,9 +1,36 @@
 {
+  "name": "accesspim",
+  "version": "1.0.0",
+  "description": "AccessPIM - Full Stack Application",
+  "private": true,
+  "workspaces": [
+    "back-end",
+    "front-end"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w back-end\" \"npm run start -w front-end\"",
+    "dev:back": "npm run dev -w back-end",
+    "dev:front": "npm run start -w front-end",
+    "build": "npm run build -w back-end && npm run build -w front-end",
+    "build:back": "npm run build -w back-end",
+    "build:front": "npm run build -w front-end",
+    "start": "npm run start -w back-end",
+    "test": "npm run test -w back-end && npm run test -w front-end",
+    "test:back": "npm run test -w back-end",
+    "test:front": "npm run test -w front-end",
+    "db:seed": "npm run db:seed -w back-end"
+  },
+  "dependencies": {
+    "uuid": "^14.0.0"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.5.0"
+    "@types/node": "^20.19.39",
+    "concurrently": "^9.1.0",
+    "jsdom": "^28.0.0",
+    "vitest": "^4.1.5"
   }
 }

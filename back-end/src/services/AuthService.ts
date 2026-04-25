@@ -57,8 +57,6 @@ export class AuthService {
             throw new AppError("Credenciais inválidas", 401);
         }
 
-        console.log(`Usuário ${user.email} logado do IP: ${meta.ip} usando ${meta.userAgent}`);
-        
         const accessToken = this.generateAccessToken(user);
         const refreshToken = this.generateRefreshToken(user);
 
@@ -92,7 +90,6 @@ export class AuthService {
         try {
             await this.blacklistToken(tokens.refreshToken);
             await this.blacklistToken(tokens.accessToken);
-            console.log("Sessão encerrada com sucesso.");
         } catch (error){
             console.error("Erro ao processar logout no servidor:", error);
         }

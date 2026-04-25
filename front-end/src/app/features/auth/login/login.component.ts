@@ -36,9 +36,11 @@ export class LoginComponent {
 		const { email, password } = this.form.getRawValue();
 
 		this.authService.login(email, password).subscribe({
-			next: () => {
+			next: (session) => {
+				// Grava a sessao antes de ir para o dashboard para o guard reconhecer o usuario.
+				this.authService.setSession(session);
 				this.loading.set(false);
-				this.router.navigate(['/dashboard']);
+				this.router.navigate(['/dashboard'], { replaceUrl: true });
 			},
 			error: () => {
 				this.loading.set(false);

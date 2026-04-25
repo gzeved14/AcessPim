@@ -1,4 +1,10 @@
+<!-- Barra superior com identidade da aplicacao e logout rapido. -->
 <nav class="navbar">
-  <span class="welcome">{{ userName || 'Usuario' }}</span>
-  <button type="button">Logout</button>
+  <!-- Exibe o nome do usuario autenticado de forma contextual. -->
+  <div class="brand">
+    <strong>AccessPIM</strong>
+    <span class="welcome">Ola, {{ userName || 'Usuario' }}</span>
+  </div>
+  <!-- Dispara o evento de logout para o componente pai. -->
+  <button type="button" class="logout-button" (click)="onLogoutClick()">Logout</button>
 </nav>

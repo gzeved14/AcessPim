@@ -1,9 +1,8 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cargo } from "../types/Cargo.js";
-import { Area } from "./Area.js";
-import { RegistroAcesso } from "./RegistroAcesso.js";
 import { JoinColumn } from "typeorm";
-import { Autorizacao } from "./Autorizacao.js";
+import type { Area } from "./Area.js";
+import type { RegistroAcesso } from "./RegistroAcesso.js";
 
 @Entity("colaborador")
 export class Colaborador {
@@ -32,10 +31,10 @@ export class Colaborador {
     @CreateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })
     criado_em!: Date;
 
-    @OneToMany(() => RegistroAcesso, (registro) => registro.colaborador)
+    @OneToMany("RegistroAcesso", (registro: RegistroAcesso) => registro.colaborador)
     acessos!: RegistroAcesso[]; //O histórico de um colaborador é a soma de todos os seus registros de entrada e saída.
 
-    @OneToMany(() => Area, (area) => area.responsavel, { nullable: false })
+    @OneToMany("Area", (area: Area) => area.responsavel, { nullable: false })
     areas_sob_responsabilidade!: Area[]; 
 
 }

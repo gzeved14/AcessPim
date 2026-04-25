@@ -1,1 +1,32 @@
+.card-skeleton {
+	height: 108px;
+	border-radius: 1rem;
+	background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+	background-size: 200% 100%;
+	animation: pulse-slide 1.2s infinite;
+}
+
+.spinner {
+	width: 0.9rem;
+	height: 0.9rem;
+	border-radius: 9999px;
+	border: 2px solid #cbd5e1;
+	border-top-color: #334155;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes pulse-slide {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
 
