@@ -6,6 +6,15 @@
 	animation: pulse-slide 1.2s infinite;
 }
 
+.rounded-2xl h1,
+.rounded-2xl h2 {
+	letter-spacing: -0.03em;
+}
+
+.back-button {
+	white-space: nowrap;
+}
+
 .spinner {
 	width: 0.9rem;
 	height: 0.9rem;

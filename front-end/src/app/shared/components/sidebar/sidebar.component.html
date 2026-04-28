@@ -1,0 +1,78 @@
+<div class="pro-sidebar" [class.collapsed]="collapsed">
+  <!-- Cabeçalho -->
+  <div class="sidebar-header">
+    <div class="sidebar-title">
+      <i class="fa fa-shield-alt"></i>
+      @if (!collapsed) {
+        <span class="title-text">AccessPIM</span>
+      }
+    </div>
+  </div>
+
+  <!-- Conteúdo Principal e Menu -->
+  <div class="sidebar-content">
+    @if (!collapsed) {
+      <div class="sidebar-profile">
+        <div class="user-pic">
+          <img [src]="userPic()" alt="User picture">
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ userName() }}</span>
+          <span class="user-role">{{ userCargo() }}</span>
+          <span class="user-status">
+            <i class="fa fa-circle"></i>
+            <span>Online</span>
+          </span>
+        </div>
+      </div>
+    } @else {
+      <div class="sidebar-profile-collapsed">
+        <img [src]="userPic()" alt="User" class="mini-pic">
+      </div>
+    }
+
+    <div class="sidebar-menu">
+      <ul>
+        @if (!collapsed) {
+          <li class="header-menu"><span>Geral</span></li>
+        }
+        
+        @for (item of menuItems; track item.link) {
+          <li class="menu-item">
+            <a [routerLink]="item.link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.link === '/dashboard' }" (click)="onNavigate()" [title]="collapsed ? item.label : ''">
+              <i [class]="item.icon"></i>
+              @if (!collapsed) {
+                <span class="menu-text">{{ item.label }}</span>
+              }
+            </a>
+          </li>
+        }
+
+        @if (userCargo() === 'ADMIN') {
+          @if (!collapsed) {
+            <li class="header-menu" style="margin-top: 15px;"><span>Administração</span></li>
+          }
+          
+          @for (item of adminMenuItems; track item.link) {
+            <li class="menu-item">
+              <a [routerLink]="item.link" routerLinkActive="active" (click)="onNavigate()" [title]="collapsed ? item.label : ''">
+                <i [class]="item.icon"></i>
+                @if (!collapsed) {
+                  <span class="menu-text">{{ item.label }}</span>
+                }
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  @if (!collapsed) {
+    <div class="sidebar-footer">
+      <a href="javascript:void(0)" title="Configurações"><i class="fa fa-cog"></i></a>
+      <a href="javascript:void(0)" title="Sair"><i class="fa fa-power-off"></i></a>
+    </div>
+  }
+</div>

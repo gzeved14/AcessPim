@@ -1,7 +1,18 @@
 -- 1. Inserir um Usuário Inicial (senha: 'admin123')
+-- 1. Inserir Usuários Iniciais (senha: 'admin123')
 INSERT INTO usuario (nome, matricula, email, senha_hash, setor, cargo)
 VALUES (
-    'Operador Padrao',
+    'Administrador do Sistema',
+    'MAT-ADM-000',
+    'admin@empresa.com',
+    '$2b$10$uA4.my7CWCftViAlVv7SP.V032pnRMAvMwjWcsb3mGazE7498L8zS',
+    'Diretoria',
+    'ADMIN'
+);
+
+INSERT INTO usuario (nome, matricula, email, senha_hash, setor, cargo)
+VALUES (
+    'Operador Padrão',
     'MAT-ADM-001',
     'operador@empresa.com',
     '$2b$10$uA4.my7CWCftViAlVv7SP.V032pnRMAvMwjWcsb3mGazE7498L8zS',

@@ -35,6 +35,14 @@ export class AreaService {
     return this.http.put<Area>(`${this.API}/${id}`, area);
   }
 
+  // Inativa a área (Soft Delete)
+  delete(id: string): Observable<Area> {
+    // Altera o status da área para inativa usando o endpoint de atualização (PUT).
+    // Isso evita o erro 404 caso a rota DELETE não esteja registrada no back-end,
+    // realizando a inativação (soft delete) de forma mais robusta.
+    return this.update(id, { ativa: false });
+  }
+
   // Útil para preencher o select de responsáveis no cadastro de áreas
   getResponsaveisDisponiveis(): Observable<any[]> {
     // Carrega colaboradores com perfil de supervisor para o select.

@@ -32,4 +32,13 @@ export default class AreaController {
 		const areaUpdate = await this.areaService.update(id, req.body);
 		return res.status(200).json(areaUpdate);
 	}
+
+	async delete( req: Request, res: Response) {
+		const { id } = req.params;
+		if (!id || typeof id !== 'string') {
+			throw new AppError("ID da área inválido ou ausente para exclusão.", 400);
+		}
+		await this.areaService.softDelete(id);
+		return res.status(204).send();
+	}
 }

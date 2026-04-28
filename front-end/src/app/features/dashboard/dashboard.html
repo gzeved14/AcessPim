@@ -1,12 +1,20 @@
 <main class="min-h-screen bg-slate-100 p-4 md:p-8">
-  <section class="mx-auto max-w-5xl space-y-6">
+  <section class="mx-auto max-w-6xl space-y-6">
     <!-- Cabecalho com saudacao do usuario autenticado -->
     <header class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p class="text-sm text-slate-500">Painel principal</p>
-          <h1 class="text-2xl font-bold text-slate-900">Ola, {{ userName() }}</h1>
+          <h1 class="text-2xl font-bold text-slate-900">Olá, {{ userName() }}</h1>
         </div>
+
+        <button
+          type="button"
+          (click)="goBack()"
+          class="back-button rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+        >
+          Voltar
+        </button>
       </div>
     </header>
 
@@ -34,11 +42,11 @@
           <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().deniedToday }}</p>
         </article>
         <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <p class="text-sm text-slate-500">Pessoas em area</p>
+          <p class="text-sm text-slate-500">Pessoas em área</p>
           <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().collaboratorsNow }}</p>
         </article>
         <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <p class="text-sm text-slate-500">Area mais ativa</p>
+          <p class="text-sm text-slate-500">Área mais ativa</p>
           <p class="mt-2 text-2xl font-bold text-slate-900">{{ cards().mostActiveArea }}</p>
         </article>
       }
@@ -52,7 +60,7 @@
         class="text-left rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
       >
         <h2 class="text-lg font-semibold text-slate-900">Colaboradores</h2>
-        <p class="mt-2 text-sm text-slate-600">Acesse cadastro e gestao de funcionarios.</p>
+        <p class="mt-2 text-sm text-slate-600">Acesse cadastro e gestão de funcionários.</p>
       </button>
 
       <button
@@ -60,7 +68,7 @@
         (click)="goTo('/areas')"
         class="text-left rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
       >
-        <h2 class="text-lg font-semibold text-slate-900">Areas</h2>
+        <h2 class="text-lg font-semibold text-slate-900">Áreas</h2>
         <p class="mt-2 text-sm text-slate-600">Visualize e administre zonas de risco.</p>
       </button>
 
@@ -70,13 +78,13 @@
         class="text-left rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
       >
         <h2 class="text-lg font-semibold text-slate-900">Acessos</h2>
-        <p class="mt-2 text-sm text-slate-600">Consulte registros e historico de entrada/saida.</p>
+        <p class="mt-2 text-sm text-slate-600">Consulte registros e histórico de entrada/saída.</p>
       </button>
     </section>
 
     <!-- Lista de ultimos acessos com loading e estado vazio -->
     <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <h2 class="text-lg font-semibold text-slate-900">Ultimos acessos</h2>
+      <h2 class="text-lg font-semibold text-slate-900">Últimos acessos</h2>
 
       @if (loading()) {
         <div class="mt-4 flex items-center gap-2 text-sm text-slate-500">
@@ -85,7 +93,7 @@
         </div>
       } @else if (latestAccesses().length === 0) {
         <p class="mt-4 text-sm text-slate-500">
-          Ainda nao existem registros para exibir.
+          Ainda não existem registros para exibir.
         </p>
       } @else {
         <ul class="mt-4 space-y-2">
@@ -93,7 +101,7 @@
             <li class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700">
               <strong>{{ registro.colaborador?.nome || 'Colaborador' }}</strong>
               em
-              <strong>{{ registro.area?.nome || 'Area' }}</strong>
+              <strong>{{ registro.area?.nome || 'Área' }}</strong>
               - {{ registro.tipo || 'tipo' }}
               @if (registro.timestamp) {
                 <span class="text-slate-500">({{ registro.timestamp | date: 'dd/MM/yyyy HH:mm' }})</span>

@@ -11,6 +11,11 @@
   gap: 1rem;
 }
 
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 /* Bloco de filtros do historico. */
 .filters {
   margin-top: 1rem;
@@ -66,6 +71,15 @@ button.secondary {
   color: #b91c1c;
 }
 
+.list-table tbody tr.row-denied {
+  background: #fef2f2;
+}
+
+.list-table tbody tr.row-denied td {
+  color: #991b1b;
+  font-weight: 600;
+}
+
 /* Tabela de exibicao do historico de acessos. */
 .list-table {
   width: 100%;
@@ -79,4 +93,15 @@ button.secondary {
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
   padding: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .page {
+    padding: 1.25rem;
+  }
+
+  .header-row,
+  .actions {
+    flex-wrap: wrap;
+  }
 }

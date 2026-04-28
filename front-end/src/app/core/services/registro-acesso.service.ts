@@ -1,76 +1,41 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { RegistroAcesso } from '../models/registro-acesso.model';
-import { AuthService } from '../auth/auth.service';
-
-// Payload usado no cadastro de entrada/saida de acesso.
-export interface RegistroMovimentacaoInput {
-	colaborador_id: string;
-	area_id: string;
-	tipo: 'entrada' | 'saida';
-	autorizado?: boolean;
-	observacao?: string | null;
-}
-
-// Filtros opcionais para consulta de historico.
-export interface RegistroHistoricoFiltros {
-	dataInicio?: string;
-	dataFim?: string;
-	area_id?: string;
-	colaborador_id?: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class RegistroAcessoService {
-	private readonly http = inject(HttpClient);
-	private readonly authService = inject(AuthService);
-	private readonly API = `${environment.apiUrl}/registro`;
+  // Base da API para a rota de registros de acesso
+  private readonly API = `${environment.apiUrl}/registro`;
 
-	// Registra uma movimentacao de acesso (entrada/saida/negativa).
-	registrarMovimentacao(payload: RegistroMovimentacaoInput): Observable<RegistroAcesso> {
-		// Regra de negocio da US04: acesso negado deve conter observacao.
-		if (payload.autorizado === false && !payload.observacao?.trim()) {
-			throw new Error('Informe uma observacao quando o acesso for negado.');
-		}
+  constructor(private http: HttpClient) {}
 
-		const operadorId = this.authService.currentUser()?.id;
-		if (!operadorId) {
-			throw new Error('Nao foi possivel identificar o operador autenticado.');
-		}
+  // Retorna o histórico de acessos aplicando filtros se existirem (usado na tela Acessos)
+  listarHistorico(filtros: any): Observable<RegistroAcesso[]> {
+    let params = new HttpParams();
+    
+    if (filtros.dataInicio) params = params.set('dataInicio', filtros.dataInicio);
+    if (filtros.dataFim) params = params.set('dataFim', filtros.dataFim);
+    if (filtros.nome_area) params = params.set('nome_area', filtros.nome_area);
+    if (filtros.nome_colaborador) params = params.set('nome_colaborador', filtros.nome_colaborador);
 
-		// Inclui o operador atual para compatibilidade com o DTO de criacao do back-end.
-		return this.http.post<RegistroAcesso>(this.API, {
-			colaborador_id: payload.colaborador_id,
-			area_id: payload.area_id,
-			tipo: payload.tipo,
-			observacao: payload.observacao ?? null,
-			// Mantido por compatibilidade com DTO atual do back-end.
-			registrado_por: operadorId,
-		});
-	}
+    return this.http.get<RegistroAcesso[]>(this.API, { params });
+  }
 
-	// Busca historico de acessos, aceitando combinacao de filtros.
-	listarHistorico(filtros: RegistroHistoricoFiltros = {}): Observable<RegistroAcesso[]> {
-		let params = new HttpParams();
+  // Envia um novo registro para o banco de dados (usado na tela Registrar Acesso)
+  registrarMovimentacao(payload: any): Observable<RegistroAcesso> {
+    const payloadTratado = {
+      colaborador_id: payload.colaborador_id,
+      area_id: payload.area_id,
+      tipo: payload.tipo,
+      // Inclui o status de autorizado. Caso a tela não envie, presume-se autorizado (true).
+      autorizado: payload.autorizado !== undefined ? payload.autorizado : true,
+      // Substitui 'null' por 'undefined' para evitar que o Zod recuse o campo opcional no back-end.
+      observacao: payload.observacao ? payload.observacao : undefined,
+      registrado_por: payload.registrado_por,
+    };
 
-		if (filtros.dataInicio) {
-			params = params.set('dataInicio', filtros.dataInicio);
-		}
-
-		if (filtros.dataFim) {
-			params = params.set('dataFim', filtros.dataFim);
-		}
-
-		if (filtros.area_id) {
-			params = params.set('area_id', filtros.area_id);
-		}
-
-		if (filtros.colaborador_id) {
-			params = params.set('colaborador_id', filtros.colaborador_id);
-		}
-
-		return this.http.get<RegistroAcesso[]>(this.API, { params });
-	}
+    return this.http.post<RegistroAcesso>(this.API, payloadTratado);
+  }
 }

@@ -60,3 +60,9 @@ CREATE TABLE token_blacklist (
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
+CREATE TABLE autorizacao (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    colaborador_id UUID REFERENCES colaborador(id),
+    area_id UUID NOT NULL REFERENCES area(id),
+    cargo_permitido TEXT
+);

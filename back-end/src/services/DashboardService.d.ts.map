@@ -1,1 +1,0 @@
-{"version":3,"file":"DashboardService.d.ts","sourceRoot":"","sources":["DashboardService.ts"],"names":[],"mappings":"AAAA,OAAO,EAAc,UAAU,EAAE,MAAM,SAAS,CAAC;AACjD,OAAO,EAAE,cAAc,EAAE,MAAM,+BAA+B,CAAC;AAI/D,qBAAa,gBAAgB;IACzB,OAAO,CAAC,UAAU,CAA6B;IAC/C,OAAO,CAAC,QAAQ,CAAmB;gBAEvB,UAAU,EAAE,UAAU;IAK5B,cAAc;;;;;;;;;;;;;;;CAqEvB"}

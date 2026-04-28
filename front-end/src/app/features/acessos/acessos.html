@@ -1,78 +1,95 @@
-<main class="page">
-  <!-- Cabecalho da tela com atalho para novo registro -->
-  <div class="header-row">
-    <h1>Acessos</h1>
-    <button type="button" (click)="goToRegistrar()">Novo registro</button>
+<div class="p-6 max-w-7xl mx-auto">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-1">Histórico de Acessos</h2>
+      <p class="text-slate-400 text-base">Acompanhe as entradas e saídas nas áreas restritas.</p>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" class="bg-zinc-800 border border-zinc-700 text-slate-300 px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-zinc-700 flex items-center gap-2" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i> Voltar
+      </button>
+      <button class="bg-teal-500 hover:bg-teal-600 text-gray-900 font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none" (click)="goToRegistrar()">
+        <i class="fa fa-plus"></i> Novo Registro
+      </button>
+    </div>
   </div>
 
-  <!-- Filtros de periodo usados para consulta do historico -->
-  <form class="filters" (ngSubmit)="onFilter()">
-    <label>
-      Data inicial
-      <input type="date" name="dataInicio" [(ngModel)]="dataInicio" />
-    </label>
-
-    <label>
-      Data final
-      <input type="date" name="dataFim" [(ngModel)]="dataFim" />
-    </label>
-
-    <label>
-      ID da area
-      <input type="text" name="areaId" [(ngModel)]="areaId" placeholder="UUID da area" />
-    </label>
-
-    <label>
-      ID do colaborador
-      <input
-        type="text"
-        name="colaboradorId"
-        [(ngModel)]="colaboradorId"
-        placeholder="UUID do colaborador"
-      />
-    </label>
-
-    <div class="actions">
-      <button type="submit">Filtrar</button>
-      <button type="button" class="secondary" (click)="clearFilter()">Limpar</button>
+  <!-- Barra de Filtros -->
+  <div class="bg-zinc-900 rounded-xl shadow-lg p-5 mb-6 text-slate-200 border border-zinc-800">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Colaborador (Nome)</label>
+        <input type="text" [(ngModel)]="nomeColaborador" placeholder="Ex: João Silva" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Área (Nome)</label>
+        <input type="text" [(ngModel)]="nomeArea" placeholder="Ex: Servidores" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Data Início</label>
+        <input type="date" [(ngModel)]="dataInicio" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500 [color-scheme:dark]">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Data Fim</label>
+        <input type="date" [(ngModel)]="dataFim" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500 [color-scheme:dark]">
+      </div>
     </div>
-  </form>
+    <div class="flex justify-end gap-3 mt-5">
+      <button class="bg-transparent border border-zinc-600 text-slate-300 px-5 py-2 rounded-md hover:bg-zinc-800 transition cursor-pointer font-medium" (click)="clearFilter()">Limpar</button>
+      <button class="bg-blue-600/20 border border-blue-500 text-blue-300 hover:bg-blue-500 hover:text-white px-6 py-2 rounded-md transition cursor-pointer font-medium" (click)="onFilter()">Buscar</button>
+    </div>
+  </div>
 
-  <!-- Mensagem amigavel de erro de consulta -->
-  @if (errorMessage()) {
-    <p class="feedback error">{{ errorMessage() }}</p>
-  }
-
-  <!-- Loading, empty state e tabela de resultados -->
   @if (loading()) {
-    <p class="feedback">Carregando historico de acessos...</p>
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow">
+      <i class="fa fa-spinner fa-spin text-2xl mb-2"></i>
+      <div>Carregando histórico...</div>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-red-400 shadow">
+      <i class="fa fa-exclamation-triangle text-2xl mb-2"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
   } @else if (records().length === 0) {
-    <p class="feedback">
-      Nenhum registro foi encontrado para os filtros informados.
-    </p>
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow border border-zinc-800">
+      <i class="fa fa-clock text-5xl mb-4 text-slate-500"></i>
+      <p>Nenhum registro encontrado para este filtro.</p>
+    </div>
   } @else {
-    <!-- Tabela de historico retornado pela API -->
-    <table class="list-table">
-      <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Colaborador</th>
-          <th>Area</th>
-          <th>Tipo</th>
-          <th>Autorizado</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (record of records(); track record.id) {
-          <tr>
-            <td>{{ record.timestamp | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>{{ record.colaborador?.nome || '-' }}</td>
-            <td>{{ record.area?.nome || '-' }}</td>
-            <td>{{ record.tipo || '-' }}</td>
-            <td>{{ record.autorizado ? 'Sim' : 'Nao' }}</td>
+    <div class="bg-zinc-900 rounded-xl shadow-lg overflow-hidden text-slate-200 border border-zinc-800">
+      <table class="w-full border-collapse text-left">
+        <thead>
+          <tr class="bg-zinc-800">
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Data/Hora</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Colaborador</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Área</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Movimento</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Status</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (record of records(); track record.id) {
+            <tr class="hover:bg-zinc-800/50 transition">
+              <td class="p-4 border-b border-zinc-800 text-slate-400 text-sm">{{ record.timestamp | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="p-4 border-b border-zinc-800 font-medium text-white">{{ $any(record).colaborador?.nome }}</td>
+              <td class="p-4 border-b border-zinc-800 text-blue-300">{{ $any(record).area?.nome }}</td>
+              <td class="p-4 border-b border-zinc-800">
+                <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase" 
+                  [ngClass]="record.tipo === 'ENTRADA' ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30' : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'">
+                  {{ record.tipo }}
+                </span>
+              </td>
+              <td class="p-4 border-b border-zinc-800">
+                <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase" 
+                  [ngClass]="record.autorizado ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'">
+                  {{ record.autorizado ? 'Autorizado' : 'Negado' }}
+                </span>
+                <div *ngIf="!record.autorizado && record.observacao" class="text-xs text-slate-500 mt-1 italic">{{ record.observacao }}</div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
-</main>
+</div>

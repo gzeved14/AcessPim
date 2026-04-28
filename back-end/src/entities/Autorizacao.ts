@@ -1,29 +1,31 @@
-import { Column, ManyToOne, Entity, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
-import type { Colaborador } from "./Colaborador.js";
-import type { Area } from "./Area.js";
+// Importa decoradores para marcar a classe e suas propriedades para virarem tabelas/colunas pelo TypeORM.
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+// Importa as classes referenciadas de colaborador e área para compor chave estrangeira.
+import { Colaborador } from "./Colaborador.js";
+import { Area } from "./Area.js";
 
+// Define que essa classe representa a entidade (tabela) chamada "autorizacao".
 @Entity("autorizacao")
 export class Autorizacao {
+    // Cria uma chave primária automática onde seu valor será um código alfanumérico global (UUID).
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
-    @ManyToOne("Colaborador")
-    @JoinColumn({ name: 'colaborador_id'})
-    colaborador!: Colaborador; // Relacionamento com Colaborador
+    // Cria um relacionamento Muitos-para-Um: Uma autorização pertence a um colaborador. `nullable` indica se a regra é global.
+    @ManyToOne(() => Colaborador, { nullable: true })
+    @JoinColumn({ name: "colaborador_id" })
+    colaborador!: Colaborador;
 
-    @Column({ type: 'uuid' })
-    colaborador_id!: string;
+    // Cria um relacionamento Muitos-para-Um conectando qual Área é o alvo da autorização dessa entidade.
+    @ManyToOne(() => Area)
+    @JoinColumn({ name: "area_id" })
+    area!: Area;
 
-    @ManyToOne("Area")
-    @JoinColumn({ name: 'area_id'})
-    area!: Area; // Relacionamento com Area
-
-    @Column({ type: 'uuid' })
-    area_id!: string;
-
-    @Column({ type: "text", nullable: false })
+    // Define em texto cru qual o cargo especifico tem permissão concedida.
+    @Column({ type: "text", nullable: true })
     cargo_permitido!: string;
 
-    @Column({ type: "timestamptz", nullable: false })
-    validade!: Date;
+    // Coluna para armazenar o prazo em que essa autorização deve expirar, caso seja algo temporário.
+    @Column({ type: 'timestamptz', nullable: true }) 
+    validade?: Date;
 }

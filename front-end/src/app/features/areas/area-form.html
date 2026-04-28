@@ -1,0 +1,57 @@
+<div class="p-6 max-w-[800px] mx-auto text-slate-200">
+  <div class="mb-6">
+    <h2 class="m-0 mb-2 text-2xl text-white">Nova Área Restrita</h2>
+    <p class="m-0 text-slate-400">Preencha os dados abaixo para cadastrar um novo local de controle.</p>
+  </div>
+
+  <div class="bg-[#1d1d1d] rounded-lg p-6 shadow-md">
+    @if (errorMessage()) {
+      <div class="text-red-500 mb-4 text-sm bg-red-500/10 p-2.5 rounded-md"><i class="fa fa-exclamation-circle"></i> {{ errorMessage() }}</div>
+    }
+
+    <form (ngSubmit)="salvar()" #form="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5 md:col-span-2">
+        <label class="text-[13px] font-semibold text-slate-300">Nome da Área</label>
+        <input type="text" name="nome" [(ngModel)]="area.nome" required placeholder="Ex: Sala de Servidores" class="bg-[#2b2b2b] border border-slate-600 text-white px-3 py-2.5 rounded-md font-inherit focus:outline-none focus:border-teal-400">
+      </div>
+
+      <div class="flex flex-col gap-1.5 md:col-span-2">
+        <label class="text-[13px] font-semibold text-slate-300">Descrição</label>
+        <textarea name="descricao" [(ngModel)]="area.descricao" rows="3" placeholder="Instruções, equipamentos obrigatórios, etc." class="bg-[#2b2b2b] border border-slate-600 text-white px-3 py-2.5 rounded-md font-inherit focus:outline-none focus:border-teal-400"></textarea>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-300">Nível de Risco</label>
+        <select name="nivel_risco" [(ngModel)]="area.nivel_risco" required class="bg-[#2b2b2b] border border-slate-600 text-white px-3 py-2.5 rounded-md font-inherit focus:outline-none focus:border-teal-400">
+          <option value="BAIXO">Baixo</option>
+          <option value="MEDIO">Médio</option>
+          <option value="ALTO">Alto</option>
+          <option value="CRITICO">Crítico</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-300">Capacidade Máxima</label>
+        <input type="number" name="capacidade" [(ngModel)]="area.capacidade" required min="1" class="bg-[#2b2b2b] border border-slate-600 text-white px-3 py-2.5 rounded-md font-inherit focus:outline-none focus:border-teal-400">
+      </div>
+
+      <div class="flex flex-col gap-1.5 md:col-span-2">
+        <label class="text-[13px] font-semibold text-slate-300">Responsável pela Área</label>
+        <select name="responsavel_id" [(ngModel)]="area.responsavel_id" required class="bg-[#2b2b2b] border border-slate-600 text-white px-3 py-2.5 rounded-md font-inherit focus:outline-none focus:border-teal-400">
+          <option value="" disabled selected>Selecione o responsável...</option>
+          @for (resp of responsaveis(); track resp.id) {
+            <option [value]="resp.id">{{ resp.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-[#333] md:col-span-2">
+        <button type="button" class="bg-transparent border border-slate-600 text-slate-300 px-5 py-2.5 rounded-md cursor-pointer transition-colors hover:bg-slate-700 disabled:opacity-60 disabled:cursor-not-allowed" (click)="cancelar()" [disabled]="loading()">Cancelar</button>
+        <button type="submit" class="bg-teal-400 text-gray-900 border-none px-5 py-2.5 rounded-md cursor-pointer font-semibold transition-colors hover:bg-teal-500 disabled:opacity-60 disabled:cursor-not-allowed" [disabled]="form.invalid || loading()">
+          <i class="fa" [class.fa-spinner]="loading()" [class.fa-spin]="loading()" [class.fa-save]="!loading()"></i> 
+          {{ loading() ? 'Salvando...' : 'Salvar Área' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

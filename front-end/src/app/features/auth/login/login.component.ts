@@ -34,8 +34,10 @@ export class LoginComponent {
 		this.errorMessage.set(null);
 
 		const { email, password } = this.form.getRawValue();
-
-		this.authService.login(email, password).subscribe({
+		// Evita erro de credencial por espacos acidentais e letras maiusculas no email.
+		const normalizedEmail = email.trim().toLowerCase();
+		
+		this.authService.login(normalizedEmail, password).subscribe({
 			next: (session) => {
 				// Grava a sessao antes de ir para o dashboard para o guard reconhecer o usuario.
 				this.authService.setSession(session);

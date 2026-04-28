@@ -42,9 +42,12 @@ export class AuthService {
 
 
     async login(email: string, password: string, meta: LoginMeta) {
+        // Normaliza o email para reduzir falhas por espaços e diferença de caixa.
+        const normalizedEmail = email.trim().toLowerCase();
+
         // Busca o usuário. O select garante que a senha_hash venha na query
         const user = await this.userRepo.findOne({
-            where: { email },
+            where: { email: normalizedEmail },
             select: ["id", "nome", "email", "senha_hash", "cargo"] 
         });
 

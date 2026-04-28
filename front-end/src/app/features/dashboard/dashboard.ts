@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
 import { DashboardCards, DashboardData } from '../../core/models/dashboard.model';
 import { DashboardService } from '../../core/services/dashboard.service';
@@ -15,17 +16,18 @@ import { DashboardService } from '../../core/services/dashboard.service';
 export class Dashboard implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly dashboardService = inject(DashboardService);
 
   // Estado de tela para cards e lista de ultimos acessos.
-  userName = computed(() => this.authService.currentUser()?.nome || 'Usuario');
+  userName = computed(() => this.authService.currentUser()?.nome || 'Usuário');
   loading = signal(true);
   errorMessage = signal('');
   cards = signal<DashboardCards>({
     totalAccessesToday: 0,
     deniedToday: 0,
     collaboratorsNow: 0,
-    mostActiveArea: 'Nenhuma area',
+    mostActiveArea: 'Nenhuma área',
   });
   latestAccesses = signal<DashboardData['latestAccesses']>([]);
 
@@ -51,7 +53,7 @@ export class Dashboard implements OnInit {
         this.errorMessage.set(
           err instanceof Error
             ? err.message
-            : 'Nao foi possivel carregar o dashboard no momento.',
+            : 'Não foi possível carregar o dashboard no momento.',
         );
         this.loading.set(false);
       },
@@ -61,5 +63,15 @@ export class Dashboard implements OnInit {
   goTo(path: string): void {
     // Atalho para navegar pelos modulos principais.
     this.router.navigate([path]);
+  }
+
+  goBack(): void {
+    // Volta para a rota anterior; em fallback mantém usuário no dashboard.
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    this.router.navigate(['/dashboard']);
   }
 }

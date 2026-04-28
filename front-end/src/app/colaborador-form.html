@@ -1,0 +1,67 @@
+<div class="p-6 max-w-[800px] mx-auto text-slate-300">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="m-0 text-slate-200 text-2xl">
+      {{ isEditMode() ? 'Editar Colaborador' : 'Novo Colaborador' }}
+    </h2>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="p-4 mb-6 bg-red-500/20 text-red-500 rounded-lg border border-red-500/30">
+      <i class="fa fa-exclamation-circle mr-2"></i> {{ errorMessage() }}
+    </div>
+  }
+
+  <form (ngSubmit)="salvar()" #form="ngForm" class="bg-[#24303F] p-6 rounded-sm border border-[#313D4A] shadow-md flex flex-col gap-5">
+    
+    <div class="flex flex-col gap-2">
+      <label for="nome" class="font-semibold text-slate-400">Nome</label>
+      <input type="text" id="nome" name="nome" [(ngModel)]="colaborador.nome" required
+        class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="flex flex-col gap-2">
+        <label for="matricula" class="font-semibold text-slate-400">Matrícula</label>
+        <input type="text" id="matricula" name="matricula" [(ngModel)]="colaborador.matricula" required [disabled]="isEditMode()"
+          class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400 disabled:opacity-60 disabled:cursor-not-allowed">
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="setor" class="font-semibold text-slate-400">Setor</label>
+        <input type="text" id="setor" name="setor" [(ngModel)]="colaborador.setor" required
+          class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="cargo" class="font-semibold text-slate-400">Cargo</label>
+        <select id="cargo" name="cargo" [(ngModel)]="colaborador.cargo" required
+          class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
+          <option value="Administrador">Administrador</option>
+          <option value="Gestor">Gestor de Área</option>
+          <option value="Operador">Operador de Segurança</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="foto_url" class="font-semibold text-slate-400">URL da Foto (Opcional)</label>
+      <input type="url" id="fotoUrl" name="fotoUrl" [(ngModel)]="colaborador.fotoUrl" placeholder="https://exemplo.com/imagem.png"
+        class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-[#313D4A]">
+      <button type="button" (click)="cancelar()" 
+        class="px-5 py-2.5 rounded bg-transparent border border-[#313D4A] text-slate-300 hover:bg-[#313D4A] cursor-pointer font-semibold transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="loading() || form.invalid" 
+        class="px-5 py-2.5 rounded bg-teal-400 text-gray-900 border-none hover:bg-teal-500 cursor-pointer font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 items-center">
+        @if (loading()) {
+          <i class="fa fa-spinner fa-spin"></i>
+        }
+        Salvar
+      </button>
+    </div>
+
+  </form>
+</div>

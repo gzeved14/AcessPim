@@ -1,82 +1,78 @@
-<main class="page">
-  <!-- Cabecalho da tela de cadastro -->
-  <div class="header-row">
-    <h1>Registrar acesso</h1>
-    <button type="button" class="secondary" (click)="goBack()">Voltar</button>
+<div class="p-6 max-w-3xl mx-auto text-slate-200">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-1">Registrar Acesso</h2>
+      <p class="text-slate-400 text-base">Lance uma nova entrada ou saída no sistema.</p>
+    </div>
+    <div>
+      <button type="button" class="bg-zinc-800 border border-zinc-700 text-slate-300 px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-zinc-700 flex items-center gap-2" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i> Voltar
+      </button>
+    </div>
   </div>
 
-  <!-- Mensagens de sucesso e erro do envio -->
-  @if (successMessage()) {
-    <p class="feedback success">{{ successMessage() }}</p>
-  }
+  <div class="bg-zinc-900 rounded-xl p-6 shadow-lg border border-zinc-800">
+    @if (errorMessage()) {
+      <div class="text-red-400 mb-6 text-sm bg-red-500/10 border border-red-500/20 p-4 rounded-lg flex items-center gap-2"><i class="fa fa-exclamation-circle text-lg"></i> {{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="text-emerald-400 mb-6 text-sm bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-lg flex items-center gap-2"><i class="fa fa-check-circle text-lg"></i> {{ successMessage() }}</div>
+    }
 
-  @if (errorMessage()) {
-    <p class="feedback error">{{ errorMessage() }}</p>
-  }
-
-  <!-- Loading das opcoes para os selects -->
-  @if (loadingOptions()) {
-    <p class="feedback">Carregando opcoes do formulario...</p>
-  } @else {
-    <!-- Formulario principal de registro de entrada/saida -->
-    <form class="form-grid" (ngSubmit)="onSubmit()">
-      <label>
-        Colaborador
-        <select name="colaboradorId" [(ngModel)]="colaboradorId" required>
-          <option value="" disabled selected>Selecione</option>
-          @for (colaborador of colaboradores(); track colaborador.id) {
-            <option [value]="colaborador.id">
-              {{ colaborador.nome }} - {{ colaborador.matricula }}
-            </option>
+    <form (ngSubmit)="onSubmit()" #form="ngForm" class="grid grid-cols-1 gap-5">
+      
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Colaborador</label>
+        <select name="colaboradorId" [(ngModel)]="colaboradorId" required class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500 disabled:opacity-50">
+          <option value="" disabled selected>Selecione quem está acessando...</option>
+          @for (colab of colaboradores(); track colab.id) {
+            <option [value]="colab.id">{{ colab.nome }} ({{ colab.matricula }})</option>
           }
         </select>
-      </label>
+      </div>
 
-      <label>
-        Area
-        <select name="areaId" [(ngModel)]="areaId" required>
-          <option value="" disabled selected>Selecione</option>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Área de Destino</label>
+        <select name="areaId" [(ngModel)]="areaId" required class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500 disabled:opacity-50">
+          <option value="" disabled selected>Selecione a área...</option>
           @for (area of areas(); track area.id) {
-            <option [value]="area.id">{{ area.nome }}</option>
+            <option [value]="area.id">{{ area.nome }} - Nível: {{ area.nivel_risco }}</option>
           }
         </select>
-      </label>
+      </div>
 
-      <label>
-        Tipo de movimentacao
-        <select name="tipo" [(ngModel)]="tipo" required>
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saida</option>
-        </select>
-      </label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Tipo de Movimentação</label>
+          <select name="tipo" [(ngModel)]="tipo" required class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500">
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+        </div>
 
-      <label>
-        Resultado
-        <select name="resultado" [(ngModel)]="resultado" required>
-          <option value="autorizado">Autorizado</option>
-          <option value="negado">Negado</option>
-        </select>
-      </label>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Situação do Acesso</label>
+          <select name="resultado" [(ngModel)]="resultado" required class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500">
+            <option value="autorizado">Autorizado</option>
+            <option value="negado">Barrado / Negado</option>
+          </select>
+        </div>
+      </div>
 
       @if (showObservacao) {
-        <label class="span-2">
-          Observacao (obrigatoria para negado)
-          <textarea
-            name="observacao"
-            [(ngModel)]="observacao"
-            rows="4"
-            placeholder="Descreva o motivo da negativa"
-            required
-          ></textarea>
-        </label>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Motivo (Obrigatório para acesso negado)</label>
+          <textarea name="observacao" [(ngModel)]="observacao" rows="3" placeholder="Qual o motivo da recusa de acesso?" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500"></textarea>
+        </div>
       }
 
-      <div class="actions span-2">
-        <!-- Acao de envio com feedback de estado -->
-        <button type="submit" [disabled]="submitting()">
-          {{ submitting() ? 'Salvando...' : 'Salvar registro' }}
+      <div class="flex justify-end gap-3 mt-4 pt-5 border-t border-zinc-800">
+        <button type="submit" class="bg-teal-500 text-gray-900 border-none px-6 py-2.5 rounded-md cursor-pointer font-semibold transition-colors hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 items-center" [disabled]="form.invalid || submitting()">
+          @if (submitting()) { <i class="fa fa-spinner fa-spin"></i> }
+          @else { <i class="fa fa-save"></i> }
+          {{ submitting() ? 'Registrando...' : 'Gravar Acesso' }}
         </button>
       </div>
     </form>
-  }
-</main>
+  </div>
+</div>
