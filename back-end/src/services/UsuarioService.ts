@@ -40,6 +40,11 @@ export class UsuarioService {
             throw new AppError("Email já cadastrado no sistema", 400);
         }
 
+        const matriculaExists = await this.repo.findOneBy({ matricula });
+        if (matriculaExists) {
+            throw new AppError("Matrícula já cadastrada no sistema", 400);
+        }
+
         const senhaHash = await hash(senha, 10);
 
         const newUser = this.repo.create({

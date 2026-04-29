@@ -1,1 +1,0 @@
-{"version":3,"file":"CreateColaboradorDTO.d.ts","sourceRoot":"","sources":["CreateColaboradorDTO.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,CAAC,EAAE,MAAM,KAAK,CAAC;AACxB,OAAO,EAAE,KAAK,EAAE,MAAM,mBAAmB,CAAC;AAE1C,eAAO,MAAM,uBAAuB;;;;;;iBAMlC,CAAC;AAEH,eAAO,MAAM,0BAA0B;;;;;;iBAA0B,CAAC;AAClE,eAAO,MAAM,0BAA0B;;;;;;iBAAuC,CAAC;AAC/E,eAAO,MAAM,uBAAuB;;;;;;iBAA6B,CAAC"}

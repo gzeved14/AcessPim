@@ -12,4 +12,5 @@ export interface Usuario {
   matricula: string;
   // Setor de lotacao do usuario.
   setor: string;
+  
 }

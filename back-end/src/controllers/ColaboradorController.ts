@@ -32,4 +32,13 @@ export default class ColaboradorController {
 		const colaboradorUpdate = await this.colaboradorService.update(id, req.body)
 		return res.status(200).json(colaboradorUpdate);
 	}
+
+	async softDelete(req: Request, res: Response) {
+        const { id } = req.params;
+        if (!id || typeof id !== 'string') {
+            throw new AppError("ID do colaborador inválido ou ausente para desativação.", 400);
+        }
+        await this.colaboradorService.softDelete(id);
+        return res.status(204).send(); // 204 No Content para indicar sucesso sem retorno de corpo
+    }
 }

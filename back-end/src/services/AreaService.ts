@@ -11,10 +11,11 @@ export class AreaService {
 
 
     async listAll() {
-        return await this.areaRepo.find({
-            relations: ["responsavel"], // Traz o colaborador supervisor (cite: 38)
-            order: { nome: "ASC" }
-        });
+        // Usar QueryBuilder para garantir que todos os campos, incluindo 'ativa', sejam selecionados.
+        return await this.areaRepo.createQueryBuilder("area")
+            .leftJoinAndSelect("area.responsavel", "responsavel")
+            .orderBy("area.nome", "ASC")
+            .getMany();
     }
 
 
@@ -50,5 +51,15 @@ export class AreaService {
         // Áreas inativas não devem aparecer no registro de acesso (cite: 56)
         Object.assign(area, dados);
         return await this.areaRepo.save(area);
+    }
+
+    /**
+     * Inativa uma área em vez de deletá-la fisicamente (Soft Delete).
+     * Isso preserva a integridade do histórico de acessos.
+     */
+    async softDelete(id: string): Promise<void> {
+        const area = await this.findById(id);
+        area.ativa = false;
+        await this.areaRepo.save(area);
     }
 }

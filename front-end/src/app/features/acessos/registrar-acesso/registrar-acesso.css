@@ -80,6 +80,14 @@ button:disabled {
   color: #166534;
 }
 
+.form-grid select:focus,
+.form-grid textarea:focus,
+.filters input:focus {
+  outline: none;
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
 /* Campo que ocupa duas colunas no layout desktop. */
 .span-2 {
   grid-column: span 2;

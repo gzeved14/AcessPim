@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
+import { AreaForm } from './features/areas/area-form';
+
 
 // Mapa central de rotas da aplicacao.
 export const routes: Routes = [
@@ -54,9 +57,30 @@ export const routes: Routes = [
         (m) => m.RegistrarAcesso,
       ),
   },
+  { path: 'areas/nova', canActivate: [authGuard], component: AreaForm },
+  { path: 'areas/editar/:id', canActivate: [authGuard], component: AreaForm },
+  
+  {
+    path: 'colaboradores/novo',
+    canActivate: [authGuard],
+    canDeactivate: [unsavedChangesGuard],
+    loadComponent: () => import('./colaborador-form').then(m => m.ColaboradorForm)
+  },
+  {
+    path: 'colaboradores/editar/:id',
+    canActivate: [authGuard],
+    canDeactivate: [unsavedChangesGuard],
+    loadComponent: () => import('./colaborador-form').then(m => m.ColaboradorForm)
+  },
+  { 
+    path: 'usuarios/novo', 
+    canActivate: [authGuard], 
+    loadComponent: () => import('./features/usuarios/usuario-form/usuario-form').then(m => m.UsuarioForm) 
+  },
   // Fallback para rotas inexistentes.
   {
     path: '**',
     redirectTo: 'login',
   },
+  
 ];

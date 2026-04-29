@@ -1,7 +1,23 @@
-<!-- Navbar global exibida apenas em rotas autenticadas. -->
-@if (showNavbar()) {
-	<app-navbar [userName]="userName()" (logout)="onLogout()"></app-navbar>
-}
+<!-- Estrutura de Layout Base do TailAdmin (Dark Mode) -->
+<div class="flex h-screen overflow-hidden bg-[#1a222c] text-slate-300">
+  
+  <!-- Sidebar -->
+  @if (showNavbar()) {
+	<app-sidebar [collapsed]="sidebarCollapsed()" (toggleSidebarEvent)="onToggleSidebar()" (navigate)="onCloseSidebar()"></app-sidebar>
+  }
 
-<!-- Conteudo principal roteado da aplicacao. -->
-<router-outlet></router-outlet>
+  <!-- Content Area -->
+  <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+	
+	<!-- Header / Navbar -->
+	@if (showNavbar()) {
+	  <app-navbar (toggleSidebar)="onToggleSidebar()"></app-navbar>
+	}
+
+	<!-- Main Content -->
+	<main>
+	  <router-outlet></router-outlet>
+	</main>
+
+  </div>
+</div>

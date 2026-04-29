@@ -1,40 +1,50 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { AcessoService } from "../services/AcessoService.js"
 import { AppError } from "../errors/AppError.js"
 export default class AcessoController {
 	constructor(private readonly accessService: AcessoService) {}
 
-	async findAll( req: Request, res: Response) {
-		const { dataInicio, dataFim, area_id, colaborador_id} = req.query;
+	async findAll( req: Request, res: Response, next: NextFunction) {
+		   try {
+			   console.log("[AcessoController] Requisição recebida em create:", req.body);
+			const { dataInicio, dataFim, nome_area, nome_colaborador} = req.query;
 
-		const records = await this.accessService.listHistory({
-			dataInicio: dataInicio as string,
-            dataFim: dataFim as string,
-            area_id: area_id as string,
-            colaborador_id: colaborador_id as string
-		});
+			const records = await this.accessService.listHistory({
+				dataInicio: dataInicio as string,
+				dataFim: dataFim as string,
+				nome_area: nome_area as string,
+				nome_colaborador: nome_colaborador as string
+			});
 
-		return res.status(200).json(records);
+			return res.status(200).json(records);
+		} catch (error) {
+			next(error);
+		}
 	}
 
-	async create( req: Request, res: Response) {
-		const { colaborador_id, area_id, tipo, observacao } = req.body;
-		
-		const registrado_por = (req as any).auth?.sub;
+	async create(req: Request, res: Response, next: NextFunction) {
+    	try {
+			const { colaborador_id, area_id, tipo, observacao, autorizado } = req.body;
+			const registrado_por = (req as any).auth?.sub;
 
-		if (!registrado_por){
-			throw new AppError("Operador não identificado no token", 401);
+			if (!registrado_por) {
+				throw new AppError("Operador não identificado no token", 401);
+			}
+
+			//  removida a checagem manual — o Zod já garante que é boolean
+			const newAccess = await this.accessService.registerAccess({
+				colaborador_id,
+				area_id,
+				tipo,
+				registrado_por,
+				observacao,
+				autorizado
+			});
+
+			return res.status(201).json(newAccess);
+		} catch (error) {
+			next(error);
 		}
-
-		const newAccess = await this.accessService.registerAccess({
-			colaborador_id,
-			area_id,
-			tipo,
-			registrado_por,
-			observacao
-		});
-
-		return res.status(201).json(newAccess);
 	}
 	
 	async update( req: Request, res: Response) {

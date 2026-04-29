@@ -12,5 +12,5 @@ export interface Area {
     // Nivel de risco da area, usado em destaque visual.
     nivel_risco: NivelRisco;
     // Indica se a area esta ativa para uso.
-    ativo: boolean;
+    ativa: boolean;
 }

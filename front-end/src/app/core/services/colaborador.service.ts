@@ -10,7 +10,7 @@ export class ColaboradorService {
   private readonly API = `${environment.apiUrl}/colaborador`;
 
   // Injeta o cliente HTTP para executar requisicoes.
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // US07: Listagem com busca (opcional passar filtros por query params)
   getColaboradores(): Observable<Colaborador[]> {
