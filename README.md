@@ -57,7 +57,7 @@ npm run test
 Use o comando abaixo para medir o tempo de resposta do dashboard em rede local:
 
 ```powershell
-$loginBody = @{ email = 'operador@empresa.com'; password = 'admin123' } | ConvertTo-Json
+$loginBody = @{ email = '...'; password = '...' } | ConvertTo-Json
 $login = Invoke-RestMethod -Uri 'http://localhost:3000/auth/login' -Method Post -ContentType 'application/json' -Body $loginBody
 $headers = @{ Authorization = "Bearer $($login.accessToken)" }
 (Measure-Command { Invoke-RestMethod -Uri 'http://localhost:3000/dashboard' -Method Get -Headers $headers | Out-Null }).TotalMilliseconds
