@@ -40,7 +40,7 @@ export class RegistrarAcesso implements OnInit {
   // Modelos do formulário
   colaboradorId = '';
   areaId = '';
-  tipo: 'entrada' | 'saida' = 'entrada';
+  tipo: 'ENTRADA' | 'SAIDA' = 'ENTRADA';
   resultado: 'autorizado' | 'negado' = 'autorizado';
   observacao = '';
 
@@ -109,9 +109,8 @@ export class RegistrarAcesso implements OnInit {
         area_id: this.areaId,
         tipo: this.tipo,
         autorizado: this.resultado === 'autorizado',
-        observacao: this.observacao || null,
-        registrado_por: operador.id // Campo obrigatório no backend
-      })
+        observacao: this.observacao || null
+      } as any)
       .subscribe({
         next: () => {
           this.successMessage.set('Registro salvo com sucesso!');
@@ -129,7 +128,7 @@ export class RegistrarAcesso implements OnInit {
   private resetForm(): void {
     this.colaboradorId = '';
     this.areaId = '';
-    this.tipo = 'entrada';
+    this.tipo = 'ENTRADA';
     this.resultado = 'autorizado';
     this.observacao = '';
   }

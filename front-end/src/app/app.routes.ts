@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 import { AreaForm } from './features/areas/area-form';
 
 
@@ -62,11 +63,13 @@ export const routes: Routes = [
   {
     path: 'colaboradores/novo',
     canActivate: [authGuard],
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () => import('./colaborador-form').then(m => m.ColaboradorForm)
   },
   {
     path: 'colaboradores/editar/:id',
     canActivate: [authGuard],
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () => import('./colaborador-form').then(m => m.ColaboradorForm)
   },
   { 

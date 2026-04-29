@@ -1,36 +1,46 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Colaborador } from '../../core/models/colaborador.model';
 import { ColaboradorService } from '../../core/services/colaborador.service';
-import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-colaboradores',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './colaboradores.html',
   styleUrl: './colaboradores.css',
 })
 export class Colaboradores implements OnInit {
   private readonly colaboradorService = inject(ColaboradorService);
-  private readonly location = inject(Location);
-  private readonly router = inject(Router);
-  public readonly authService = inject(AuthService);
+
+  formatarCargo(cargo: string): string {
+  const labels: Record<string, string> = {
+    ADMIN:            'Administrador',
+    GESTOR_DE_AREA:   'Gestor de Área',
+    OP_DE_SEGURANCA:  'Operador de Segurança',
+  };
+  return labels[cargo] ?? cargo;
+}
 
   // Estados da listagem para loading, erro e conteudo.
   loading = signal(true);
   errorMessage = signal('');
+  createErrorMessage = signal('');
+  createLoading = signal(false);
+  showCreateForm = signal(false);
   colaboradores = signal<Colaborador[]>([]);
+
+  novoColaborador = {
+    nome: '',
+    matricula: '',
+    cargo: '',
+    setor: '',
+  };
 
   ngOnInit(): void {
     // Dispara a busca inicial ao abrir a pagina.
     this.loadColaboradores();
-  }
-
-  // Getter para facilitar a validação de permissão no HTML
-  get isAdmin(): boolean {
-    return this.authService.currentUser()?.cargo === 'Administrador';
   }
 
   loadColaboradores(): void {
@@ -55,64 +65,54 @@ export class Colaboradores implements OnInit {
       },
     });
   }
-
-  goToCreate(): void {
-    // Navega para a tela de criação de um novo colaborador
-    this.router.navigate(['/colaboradores/novo']);
+  openCreateForm(): void {
+    this.showCreateForm.set(true);
+    this.createErrorMessage.set('');
   }
 
-  goToEdit(id: string): void {
-    // Navega para a tela de edição passando o ID do colaborador
-    this.router.navigate(['/colaboradores/editar', id]);
+  closeCreateForm(): void {
+    this.showCreateForm.set(false);
+    this.createErrorMessage.set('');
+    this.novoColaborador = { nome: '', matricula: '', cargo: '', setor: '' };
   }
 
-  deleteColaborador(id: string): void {
-    if (confirm('Tem certeza que deseja desativar este colaborador?')) {
-      this.loading.set(true);
-      this.errorMessage.set('');
+  submitNovoColaborador(): void {
+    this.createLoading.set(true);
+    this.createErrorMessage.set('');
 
-      // Usa o método 'update' do service para inativar o colaborador (soft delete)
-      this.colaboradorService.update(id, { ativo: false }).subscribe({
+    this.colaboradorService
+      .create({ ...this.novoColaborador, ativo: true })
+      .subscribe({
         next: () => {
-          this.loadColaboradores(); // Recarrega a lista para refletir o novo status
-        },
-        error: (err: unknown) => {
-          this.errorMessage.set(
-            err instanceof Error ? err.message : 'Erro ao tentar desativar o colaborador.'
-          );
-          this.loading.set(false);
-        },
-      });
-    }
-  }
-
-  reactivateColaborador(id: string): void {
-    if (confirm('Tem certeza que deseja reativar este colaborador?')) {
-      this.loading.set(true);
-      this.errorMessage.set('');
-
-      // Envia o status oposto (ativo: true) para restaurar
-      this.colaboradorService.update(id, { ativo: true }).subscribe({
-        next: () => {
+          this.closeCreateForm();
           this.loadColaboradores();
+          this.createLoading.set(false);
+        },
+        error: (err: unknown) => {
+          this.createErrorMessage.set(
+            err instanceof Error
+              ? err.message
+              : 'Nao foi possivel cadastrar o colaborador no momento.',
+          );
+          this.createLoading.set(false);
+        },
+      });
+  }
+
+  desativarColaborador(id: string): void {
+    if (confirm('Tem certeza que deseja desativar este colaborador?')) {
+      this.colaboradorService.softDelete(id).subscribe({
+        next: () => {
+          this.loadColaboradores(); // Recarrega a lista após a desativação
         },
         error: (err: unknown) => {
           this.errorMessage.set(
-            err instanceof Error ? err.message : 'Erro ao tentar reativar o colaborador.'
+            err instanceof Error
+              ? err.message
+              : 'Não foi possível desativar o colaborador.',
           );
-          this.loading.set(false);
         },
       });
     }
-  }
-
-  goBack(): void {
-    // Mantém experiência consistente de retorno entre os módulos.
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      this.location.back();
-      return;
-    }
-
-    this.router.navigate(['/dashboard']);
   }
 }

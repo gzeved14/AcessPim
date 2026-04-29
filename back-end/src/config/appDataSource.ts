@@ -24,4 +24,11 @@ export const appDataSource = new DataSource({
     synchronize: false,
     logging: false,
     // Lista explícita para evitar falhas de metadata com glob patterns no runtime ESM.
+    entities: [
+        Area,
+        Colaborador,
+        RegistroAcesso,
+        TokenBlacklist,
+        Usuario
+    ],
 });

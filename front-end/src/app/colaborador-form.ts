@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ColaboradorService } from './core/services/colaborador.service';
@@ -22,6 +22,8 @@ export class ColaboradorForm implements OnInit {
   errorMessage = signal('');
   isEditMode = signal(false);
   colaboradorId = '';
+
+  @ViewChild('colaboradorForm') colaboradorForm!: NgForm;
 
   colaborador: Partial<Colaborador> = {
     nome: '',

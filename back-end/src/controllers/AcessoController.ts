@@ -7,13 +7,13 @@ export default class AcessoController {
 	async findAll( req: Request, res: Response, next: NextFunction) {
 		   try {
 			   console.log("[AcessoController] Requisição recebida em create:", req.body);
-			const { dataInicio, dataFim, area_id, colaborador_id} = req.query;
+			const { dataInicio, dataFim, nome_area, nome_colaborador} = req.query;
 
 			const records = await this.accessService.listHistory({
 				dataInicio: dataInicio as string,
 				dataFim: dataFim as string,
-				area_id: area_id as string,
-				colaborador_id: colaborador_id as string
+				nome_area: nome_area as string,
+				nome_colaborador: nome_colaborador as string
 			});
 
 			return res.status(200).json(records);
@@ -22,20 +22,16 @@ export default class AcessoController {
 		}
 	}
 
-	async create( req: Request, res: Response, next: NextFunction) {
-		try {
+	async create(req: Request, res: Response, next: NextFunction) {
+    	try {
 			const { colaborador_id, area_id, tipo, observacao, autorizado } = req.body;
-			
 			const registrado_por = (req as any).auth?.sub;
 
-			if (!registrado_por){
+			if (!registrado_por) {
 				throw new AppError("Operador não identificado no token", 401);
 			}
 
-			if (typeof autorizado !== 'boolean') {
-				throw new AppError("O campo 'autorizado' é obrigatório e deve ser um booleano.", 400);
-			}
-
+			//  removida a checagem manual — o Zod já garante que é boolean
 			const newAccess = await this.accessService.registerAccess({
 				colaborador_id,
 				area_id,

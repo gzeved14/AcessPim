@@ -3,7 +3,7 @@
   
   <!-- Sidebar -->
   @if (showNavbar()) {
-	<app-sidebar></app-sidebar>
+	<app-sidebar [collapsed]="sidebarCollapsed()" (toggleSidebarEvent)="onToggleSidebar()" (navigate)="onCloseSidebar()"></app-sidebar>
   }
 
   <!-- Content Area -->
@@ -11,7 +11,7 @@
 	
 	<!-- Header / Navbar -->
 	@if (showNavbar()) {
-	  <app-navbar></app-navbar>
+	  <app-navbar (toggleSidebar)="onToggleSidebar()"></app-navbar>
 	}
 
 	<!-- Main Content -->

@@ -70,4 +70,11 @@ export class ColaboradorService {
         // Executa o UPSERT ou o UPDATE com os metadados antigos reescritos por suas partes novas.
         return await this.repo.save(colaborador);
     }
+
+    // Desativa um colaborador (soft delete)
+    async softDelete(id: string): Promise<void> {
+        const colaborador = await this.findById(id); // Reutiliza findById para verificar a existência
+        colaborador.ativo = false;
+        await this.repo.save(colaborador);
+    }
 }

@@ -1,92 +1,120 @@
-<div class="p-6 max-w-5xl mx-auto">
-  <div class="flex justify-between items-center mb-8">
-    <div>
-      <h2 class="text-3xl font-bold text-white mb-1">Colaboradores</h2>
-      <p class="text-slate-400 text-base">Gerenciamento de funcionários e status.</p>
-    </div>
-    <div class="flex gap-3">
-      <button type="button" class="bg-zinc-800 border border-zinc-700 text-slate-300 px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-zinc-700 flex items-center gap-2" (click)="goBack()">
-        <i class="fa fa-arrow-left"></i> Voltar
-      </button>
-      @if (isAdmin) {
-        <button class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none" (click)="goToCreate()">
-          <i class="fa fa-plus"></i> Novo Colaborador
-        </button>
-      }
-    </div>
-  </div>
+<main class="p-8">
+  <header class="mb-4 flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-bold text-slate-900">Colaboradores</h1>
+    <button
+      type="button"
+      class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+      (click)="openCreateForm()"
+    >
+      + Adicionar novo colaborador
+    </button>
+  </header>
 
-  @if (errorMessage()) {
-    <div class="text-center p-12 bg-zinc-900 rounded-xl text-red-400 shadow mb-6">
-      <i class="fa fa-exclamation-triangle text-2xl mb-2"></i>
-      <div>{{ errorMessage() }}</div>
-    </div>
+  @if (showCreateForm()) {
+    <section class="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-800">Novo colaborador</h2>
+
+      @if (createErrorMessage()) {
+        <p class="mt-3 text-sm text-red-700">{{ createErrorMessage() }}</p>
+      }
+
+      <form class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2" (ngSubmit)="submitNovoColaborador()">
+        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
+          Nome
+          <input
+            name="nome"
+            [(ngModel)]="novoColaborador.nome"
+            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+            required
+          />
+        </label>
+
+        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
+          Matricula
+          <input
+            name="matricula"
+            [(ngModel)]="novoColaborador.matricula"
+            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+            required
+          />
+        </label>
+
+        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
+          Cargo
+          <select
+            name="cargo"
+            [(ngModel)]="novoColaborador.cargo"
+            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+            required
+          >
+            <option value="" disabled>Selecione um cargo</option>
+            <option value="ADMIN">Admin</option>
+            <option value="GESTOR_DE_AREA">Gestor de Área</option>
+            <option value="OP_DE_SEGURANCA">Operador de Segurança</option>
+          </select>
+        </label>
+
+        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
+          Setor
+          <input
+            name="setor"
+            [(ngModel)]="novoColaborador.setor"
+            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+            required
+          />
+        </label>
+
+        <div class="col-span-full flex justify-end gap-2">
+          <button
+            type="button"
+            class="rounded-lg bg-slate-200 px-4 py-2 font-semibold text-slate-800 transition hover:bg-slate-300"
+            (click)="closeCreateForm()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            [disabled]="createLoading()"
+          >
+            {{ createLoading() ? 'Salvando...' : 'Salvar colaborador' }}
+          </button>
+        </div>
+      </form>
+    </section>
   }
 
+  <!-- Erro amigavel exibido quando a API retorna falha -->
+  @if (errorMessage()) {
+    <p class="mt-4 text-sm text-red-700">{{ errorMessage() }}</p>
+  }
   @if (loading()) {
-    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow">
-      <i class="fa fa-spinner fa-spin text-2xl mb-2"></i>
-      <div>Carregando colaboradores...</div>
-    </div>
+    <p class="mt-4 text-slate-600">Carregando colaboradores...</p>
   } @else if (colaboradores().length === 0) {
-    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow">
-      <i class="fa fa-users text-5xl mb-4 text-slate-300"></i>
-      <p>Nenhum colaborador foi encontrado para a consulta atual.</p>
-    </div>
+    <p class="mt-4 text-slate-600">Nenhum colaborador foi encontrado para a consulta atual.</p>
   } @else {
-    <div class="bg-zinc-900 rounded-xl shadow-lg overflow-hidden text-slate-200">
-      <table class="w-full border-collapse text-left">
-        <thead>
-          <tr class="bg-zinc-800">
-            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Nome</th>
-            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Matrícula</th>
-            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Cargo</th>
-            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Status</th>
-            @if (isAdmin) {
-              <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Ações</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
+    <!-- Tabela da listagem de colaboradores -->
+    <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Nome</th>
+          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Matricula</th>
+          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Cargo</th>
+          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
         @for (colaborador of colaboradores(); track colaborador.id) {
-          <tr [class.opacity-60]="colaborador.ativo === false" class="hover:bg-zinc-800 transition">
-            <td class="p-4 border-b border-zinc-800">
-              <span class="font-bold text-lg text-white">{{ colaborador.nome }}</span>
-            </td>
-            <td class="p-4 border-b border-zinc-800">{{ colaborador.matricula }}</td>
-            <td class="p-4 border-b border-zinc-800">{{ colaborador.cargo }}</td>
-            <td class="p-4 border-b border-zinc-800">
-              <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wide" [ngClass]="colaborador.ativo ? 'bg-emerald-800/30 text-emerald-400 border border-emerald-700' : 'bg-zinc-800 text-slate-400 border border-zinc-700'">
-                {{ colaborador.ativo ? 'Ativo' : 'Inativo' }}
-              </span>
-            </td>
-            @if (isAdmin) {
-              <td class="p-4 border-b border-zinc-800 flex gap-4 items-center min-w-[120px]">
-                <button type="button" class="bg-blue-600/20 border border-blue-500 text-blue-300 hover:bg-blue-500 hover:text-white cursor-pointer p-2 rounded-lg transition-colors flex items-center justify-center" title="Editar" (click)="goToEdit(colaborador.id)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                  </svg>
-                </button>
-                @if (colaborador.ativo) {
-                  <button type="button" class="bg-yellow-500/20 border border-yellow-400 text-yellow-300 hover:bg-yellow-400 hover:text-white cursor-pointer p-2 rounded-lg transition-colors flex items-center justify-center" title="Desativar" (click)="deleteColaborador(colaborador.id)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                    </svg>
-                  </button>
-                } @else {
-                  <button type="button" class="bg-emerald-500/20 border border-emerald-500 text-emerald-400 hover:bg-emerald-500 hover:text-white cursor-pointer p-2 rounded-lg transition-colors flex items-center justify-center" title="Reativar" (click)="reactivateColaborador(colaborador.id)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                      <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                    </svg>
-                  </button>
-                }
-              </td>
-            }
+          <tr>
+            <td class="px-3 py-3 text-sm text-slate-800">{{ colaborador.nome }}</td>
+            <td class="px-3 py-3 text-sm text-slate-700">{{ colaborador.matricula }}</td>
+            <td class="px-3 py-3 text-sm text-slate-700">{{ formatarCargo(colaborador.cargo) }}</td>
+            <td class="px-3 py-3 text-sm font-medium" [class.text-emerald-700]="colaborador.ativo" [class.text-slate-500]="!colaborador.ativo">{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}</td>
           </tr>
         }
       </tbody>
     </table>
     </div>
   }
-</div>
+</main>

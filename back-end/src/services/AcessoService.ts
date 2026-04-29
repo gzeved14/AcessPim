@@ -12,7 +12,7 @@ import { Tipo } from "../types/Tipo.js";
 interface RegisterAccessInput {
     colaborador_id: string;    // ID do colaborador (quem está entrando ou saindo)
     area_id: string;           // ID da área que ele tentou acessar
-    tipo: 'entrada' | 'saida'; // Tipo da movimentação de registro
+    tipo: string;              // Tipo da movimentação de registro
     autorizado: boolean;       // Booleano se a entrada foi autorizada de fato
     registrado_por: string;    // ID do usuário (sistema ou guarda) que inseriu o acesso
     observacao?: string;       // Texto descritivo (obrigatório se não foi autorizado)
@@ -53,7 +53,7 @@ export class AcessoService {
         const newAccess = this.repo.create({
             colaborador: { id: colaborador_id } as Colaborador,
             area: { id: area_id } as Area,
-            tipo: tipo === 'entrada' ? Tipo.ENTRADA : Tipo.SAIDA,
+            tipo: tipo.toUpperCase() === 'ENTRADA' ? Tipo.ENTRADA : Tipo.SAIDA,
             autorizado,
             registrado_por: { id: registrado_por } as Usuario,
             observacao: observacao || null,
@@ -67,6 +67,12 @@ export class AcessoService {
             console.error("[AcessoService.registerAccess] Erro no banco de dados:", error);
             if (error.code === '23503') { // Código de erro do PostgreSQL para foreign_key_violation
                 throw new AppError("Erro de validação: Colaborador, Área ou Usuário (registrado_por) não encontrado no banco de dados.", 400);
+            }
+            if (error.code === '23502') { // Código de erro do PostgreSQL para not_null_violation
+                throw new AppError(`Erro de validação: O campo '${error.column}' é obrigatório e não pode ser nulo no banco.`, 400);
+            }
+            if (error.code === '22P02') { // Código do PostgreSQL para representação de texto inválida (ex: Enum divergente)
+                throw new AppError("Erro de validação: O tipo de acesso informado diverge das regras do banco de dados (verifique maiúsculas/minúsculas do Enum).", 400);
             }
             throw new AppError("Erro interno ao tentar salvar o registro de acesso.", 500);
         }
