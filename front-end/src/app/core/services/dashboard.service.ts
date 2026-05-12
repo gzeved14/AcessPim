@@ -11,9 +11,11 @@ export class DashboardService {
   private readonly API = `${environment.apiUrl}/dashboard`;
 
   // Retorna o payload consolidado do dashboard (cards + ocupacao + ultimos acessos).
-  getDashboard(): Observable<DashboardData> {
-    return this.http.get<DashboardData>(this.API);
-  }
+  // Altera o serviço para aceitar o parâmetro de período
+  getDashboard(period: string = 'today'): Observable<DashboardData> {
+  // Isso enviará a requisição como: /dashboard?period=week
+   return this.http.get<DashboardData>(`${this.API}?period=${period}`);
+}
 
   // Atalho para consumo direto da lista dos ultimos registros.
   getLatestAccesses(): Observable<RegistroAcesso[]> {

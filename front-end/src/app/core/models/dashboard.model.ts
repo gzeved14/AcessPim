@@ -4,6 +4,9 @@ import { RegistroAcesso } from './registro-acesso.model';
 export interface DashboardCards {
   // Total de acessos registrados no dia corrente.
   totalAccessesToday: number;
+  totalAccessesThisWeek: number;
+  totalAccessesThisMonth: number;
+  totalAccessesThisYear: number;
   // Total de acessos negados no dia corrente.
   deniedToday: number;
   // Quantidade de pessoas em area restrita no momento.
@@ -25,11 +28,17 @@ export interface AreaOccupancyItem {
 }
 
 // Payload consolidado retornado por GET /dashboard.
+// Localize este bloco no seu arquivo de modelos:
+export interface HourlyAccess {
+  total: number;
+  hora?: number;
+  dia?: string; // Representa o dia no formato 'YYYY-MM-DD'
+  mes?: number;
+  mesNome?: string; // Adicione esta linha
+}
 export interface DashboardData {
-  // Cards principais da visao gerencial.
   cards: DashboardCards;
-  // Lista de ocupacao por area.
   areaOccupancy: AreaOccupancyItem[];
-  // Ultimos registros para exibicao imediata.
   latestAccesses: RegistroAcesso[];
+  accessesByHour: HourlyAccess[];
 }

@@ -56,6 +56,12 @@ button {
   cursor: pointer;
 }
 
+/* Regra adicionada para forçar a cor verde do botão "Novo Registro",
+   caso o Tailwind CSS não esteja sendo aplicado corretamente. */
+.access-register-button {
+  background-color: #059669 !important; /* Cor para emerald-600 */
+  color: #ffffff !important;
+}
 /* Variacao secundaria para acoes menos prioritarias. */
 button.secondary {
   background: #475569;

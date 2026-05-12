@@ -2,3 +2,15 @@
 .env 
 /docker-compose.yml
 /docker-compose.yaml
+# Ignora todas as fotos enviadas, mas mantém a pasta através do .gitkeep
+back-end/uploads/fotos/*
+!back-end/uploads/fotos/.gitkeep
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/dist
+/build
+.DS_Store
+Thumbs.db
+.vscode/

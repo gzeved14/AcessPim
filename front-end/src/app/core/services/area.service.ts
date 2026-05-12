@@ -42,7 +42,10 @@ export class AreaService {
     // realizando a inativação (soft delete) de forma mais robusta.
     return this.update(id, { ativa: false });
   }
-
+  // Deleta área 
+  hardDelete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API}/${id}`);
+  }
   // Útil para preencher o select de responsáveis no cadastro de áreas
   getResponsaveisDisponiveis(): Observable<any[]> {
     // Carrega colaboradores com perfil de supervisor para o select.

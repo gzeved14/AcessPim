@@ -3,6 +3,10 @@ import { Repository, DataSource } from "typeorm";
 import { AppError } from "../errors/AppError.js"
 import { hash } from "bcryptjs";
 
+/**
+ * @interface CreateUserInput
+ * @description Define a estrutura de dados esperada para a criação de um novo usuário.
+ */
 type CreateUserInput = {
     nome: string;
     matricula: string;
@@ -12,6 +16,10 @@ type CreateUserInput = {
     cargo: Usuario["cargo"];
 };
 
+/**
+ * @interface UpdateUserInput
+ * @description Define a estrutura de dados esperada para a atualização de um usuário, permitindo campos opcionais.
+ */
 type UpdateUserInput = {
     nome?: string;
     matricula?: string;

@@ -39,3 +39,29 @@
 	}
 }
 
+/* 1. Força o container do gráfico a ter altura e alinhar na base */
+.flex.items-end.h-32 {
+    height: 128px !important; 
+    display: flex !important;
+    align-items: flex-end !important;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+    overflow: visible !important; /* Garante que as barras não sejam cortadas */
+}
+
+/* 2. Força as barras azuis a aparecerem */
+.bg-blue-500 {
+    background-color: #3b82f6 !important; /* Força o azul */
+    min-width: 20px !important; /* Garante largura mínima */
+    border-radius: 4px 4px 0 0 !important;
+    display: block !important;
+    position: relative;
+    transition: height 0.3s ease;
+}
+
+/* 3. Ajuste para o texto das horas (labels) */
+.text-\[10px\] {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    margin-top: 4px;
+}

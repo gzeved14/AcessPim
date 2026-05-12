@@ -16,5 +16,7 @@ areaRoutes.get('/', areaController.findAll.bind(areaController));
 areaRoutes.get('/:id', areaController.findById.bind(areaController));
 areaRoutes.post('/', validateBody(createAreaSchema), areaController.create.bind(areaController));
 areaRoutes.put('/:id', validateBody(updateAreaSchema), areaController.update.bind(areaController));
+areaRoutes.patch('/:id/toggle-status', areaController.delete.bind(areaController));
+areaRoutes.delete('/:id', areaController.hardDelete.bind(areaController));
 
 export default areaRoutes;

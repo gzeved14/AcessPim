@@ -30,12 +30,24 @@ export default class AuthController {
             user: sanitizeUser(result.usuario)
         });
     }
-
+    /**
+     * @method refresh
+     * @description Renova o token de acesso usando um token de refresh.
+     * @param req - Objeto de requisição (contém refreshToken no body).
+     * @param res - Objeto de resposta.
+     * @returns Response - Resposta JSON com novos tokens de acesso e refresh.
+     */
     async refresh(req: Request, res: Response) {
         const result = await this.authService.refresh(req.body.refreshToken); 
         return res.status(200).json(result);
     }
-
+    /**
+     * @method logout
+     * @description Realiza o logout do usuário, invalidando os tokens de acesso e refresh.
+     * @param req - Objeto de requisição (contém refreshToken no body e accessToken no header).
+     * @param res - Objeto de resposta.
+     * @returns Response - Resposta 204 No Content.
+     */
     async logout(req: Request, res: Response) {
         const authHeader = req.headers.authorization; //busca o campo authorization no header
         const accessToken = authHeader?.startsWith("Bearer ")//verifica se a string começa com Bearer || a ? verifica se o valor de authHeader não é nulo ou se authHeader existe

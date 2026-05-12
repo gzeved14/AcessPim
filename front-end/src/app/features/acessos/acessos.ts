@@ -91,4 +91,31 @@ export class Acessos implements OnInit {
         },
       });
   }
+  exportarCSV(): void {
+  const records = this.records();
+  if (records.length === 0) return;
+
+  const header = ['Data/Hora', 'Colaborador', 'Área', 'Tipo', 'Status', 'Observação'];
+  
+  const rows = records.map(r => [
+    new Date(r.timestamp).toLocaleString('pt-BR'),
+    (r as any).colaborador?.nome ?? '',
+    (r as any).area?.nome ?? '',
+    r.tipo,
+    r.autorizado ? 'Autorizado' : 'Negado',
+    r.observacao ?? ''
+  ]);
+
+  const csv = [header, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';'))
+      .join('\n');
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `acessos_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 }

@@ -8,8 +8,14 @@
       <button type="button" class="bg-zinc-800 border border-zinc-700 text-slate-300 px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-zinc-700 flex items-center gap-2" (click)="goBack()">
         <i class="fa fa-arrow-left"></i> Voltar
       </button>
-      <button class="bg-teal-500 hover:bg-teal-600 text-gray-900 font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none" (click)="goToRegistrar()">
+      <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none access-register-button" (click)="goToRegistrar()">
         <i class="fa fa-plus"></i> Novo Registro
+      </button>
+      <button 
+        class="bg-zinc-700 border border-zinc-600 text-slate-300 hover:bg-zinc-600 font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none"
+        (click)="exportarCSV()"
+        [disabled]="records().length === 0">
+        <i class="fa fa-download"></i> Exportar CSV
       </button>
     </div>
   </div>

@@ -41,4 +41,14 @@ export default class AreaController {
 		await this.areaService.softDelete(id);
 		return res.status(204).send();
 	}
+
+	async hardDelete(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!id || typeof id !== 'string') {
+        throw new AppError("ID da área inválido ou ausente para exclusão.", 400);
+    }
+    await this.areaService.delete(id);
+    return res.status(204).send();
+	}
+	
 }

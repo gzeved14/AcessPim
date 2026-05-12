@@ -8,9 +8,10 @@ export interface Area {
     // Nome exibido na interface.
     nome: string;
     // Descricao livre da area.
-    descricao: string;
+    descricao?: string;
     // Nivel de risco da area, usado em destaque visual.
     nivel_risco: NivelRisco;
-    // Indica se a area esta ativa para uso.
+    responsavel_id: string;
+    capacidade: number;
     ativa: boolean;
 }

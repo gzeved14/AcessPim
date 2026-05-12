@@ -32,6 +32,12 @@ export class RegistrarAcesso implements OnInit {
   submitting = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
+  areaLotada = signal(false);
+  
+  // Preview de autorização
+  previewLoading = signal(false);
+  previewResult = signal<any>(null);
+  showPreview = signal(false);
 
   // Opções para os selects
   colaboradores = signal<Colaborador[]>([]);
@@ -76,6 +82,57 @@ export class RegistrarAcesso implements OnInit {
 
   get showObservacao(): boolean {
     return this.resultado === 'negado';
+  }
+
+  onAreaChange(): void {
+    // A validação real de capacidade é feita no backend.
+    // Este é apenas um reset visual preventivo.
+    this.areaLotada.set(false);
+    this.checkAuthorization();
+  }
+
+  onTipoChange(): void {
+    // Quando o tipo muda, verifica novamente a autorização
+    this.checkAuthorization();
+  }
+
+  /**
+   * Verifica a autorização do acesso ANTES de registrar.
+   * Mostra um preview com detalhes sobre se será autorizado ou não.
+   */
+  checkAuthorization(): void {
+    // Limpa preview anterior
+    this.previewResult.set(null);
+    this.showPreview.set(false);
+
+    // Se não há colaborador e área selecionados, não checa
+    if (!this.colaboradorId || !this.areaId) {
+      return;
+    }
+
+    this.previewLoading.set(true);
+
+    this.registroAcessoService
+      .verificarAutorizacao(this.colaboradorId, this.areaId, this.tipo)
+      .subscribe({
+        next: (preview) => {
+          this.previewResult.set(preview);
+          this.showPreview.set(true);
+          this.previewLoading.set(false);
+          
+          // Se não autorizado e tipo é entrada, marca como negado
+          if (!preview.autorizado && this.tipo === 'ENTRADA') {
+            this.resultado = 'negado';
+          } else {
+            this.resultado = 'autorizado';
+          }
+        },
+        error: () => {
+          // Se der erro na verificação, apenas não mostra o preview
+          this.previewLoading.set(false);
+          this.showPreview.set(false);
+        },
+      });
   }
 
   onSubmit(): void {

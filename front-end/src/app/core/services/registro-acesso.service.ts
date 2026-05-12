@@ -23,6 +23,18 @@ export class RegistroAcessoService {
     return this.http.get<RegistroAcesso[]>(this.API, { params });
   }
 
+  /**
+   * Preview de autorização: Verifica se um acesso será autorizado ANTES de registrar.
+   * Retorna detalhes sobre a autorização (motivo, capacidade, etc).
+   */
+  verificarAutorizacao(colaboradorId: string, areaId: string, tipo: string): Observable<any> {
+    return this.http.post<any>(`${this.API}/preview`, {
+      colaborador_id: colaboradorId,
+      area_id: areaId,
+      tipo,
+    });
+  }
+
   // Envia um novo registro para o banco de dados (usado na tela Registrar Acesso)
   registrarMovimentacao(payload: any): Observable<RegistroAcesso> {
     const payloadTratado = {
@@ -37,5 +49,17 @@ export class RegistroAcessoService {
     };
 
     return this.http.post<RegistroAcesso>(this.API, payloadTratado);
+  }
+
+  getHistoricoByColaborador(colaboradorId: string): Observable<RegistroAcesso[]> {
+    return this.http.get<RegistroAcesso[]>(`${this.API}/colaborador/${colaboradorId}/historico`);
+  }
+
+  getHistoricoGestor(): Observable<RegistroAcesso[]> {
+    return this.http.get<RegistroAcesso[]>(`${this.API}/gestor/minha-area`);
+  }
+
+  getHistoricoColaboradorNaMinhaArea(colaboradorId: string): Observable<RegistroAcesso[]> {
+    return this.http.get<RegistroAcesso[]>(`${this.API}/gestor/colaborador/${colaboradorId}`);
   }
 }

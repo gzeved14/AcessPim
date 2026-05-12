@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Cargo } from "../types/Cargo.js";
+import { PerfilUsuario } from "../types/PerfilUsuario.js";
 import { OneToMany } from "typeorm";
 import { RegistroAcesso } from "./RegistroAcesso.js";
 
@@ -24,8 +24,8 @@ export class Usuario {
     @Column({ type: 'text', nullable: false })
     setor!: string;
 
-    @Column({ type: 'text', enum: Cargo, nullable: false })
-    cargo!: Cargo;
+    @Column({ type: 'text', enum: PerfilUsuario, nullable: false })
+    cargo!: PerfilUsuario;
 
     @Column({ type: 'timestamptz', default: () => 'NOW()' })
     criado_em!: Date;

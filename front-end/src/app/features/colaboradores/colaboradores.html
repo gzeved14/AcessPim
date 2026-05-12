@@ -1,13 +1,23 @@
 <main class="p-8">
   <header class="mb-4 flex items-center justify-between gap-4">
-    <h1 class="text-2xl font-bold text-slate-900">Colaboradores</h1>
+    <h1 class="text-2xl font-bold text-white">Colaboradores</h1>
+    @if (isGestor) {
     <button
-      type="button"
-      class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+      (click)="verHistoricoGestor()" 
+      class="px-3 py-1 rounded-md bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-colors cursor-pointer"
+    >
+      Ver Histórico da Minha Área
+    </button>
+  }
+    @if (isAdmin) {
+    <button
+      type="button" 
+      class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 custom-green-button cursor-pointer"
       (click)="openCreateForm()"
     >
       + Adicionar novo colaborador
     </button>
+   }
   </header>
 
   @if (showCreateForm()) {
@@ -44,15 +54,31 @@
           <select
             name="cargo"
             [(ngModel)]="novoColaborador.cargo"
+            (change)="onCargoChange()"
             class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
             required
           >
             <option value="" disabled>Selecione um cargo</option>
-            <option value="ADMIN">Admin</option>
-            <option value="GESTOR_DE_AREA">Gestor de Área</option>
-            <option value="OP_DE_SEGURANCA">Operador de Segurança</option>
+            @for (cargo of cargoOptions; track cargo) {
+              <option [value]="cargo">{{ cargo }}</option>
+            }
+            <option value="Outros">Outros</option>
           </select>
         </label>
+
+        @if (showCustomCargo()) {
+          <label class="flex flex-col gap-1 text-sm font-medium text-slate-700 md:col-span-2">
+            Digite o cargo
+            <input
+              name="customCargo"
+              [(ngModel)]="customCargo"
+              type="text"
+              placeholder="Ex: Técnico Especializado, Operador Sênior, etc..."
+              class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
+              required
+            />
+          </label>
+        }
 
         <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
           Setor
@@ -67,15 +93,15 @@
         <div class="col-span-full flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg bg-slate-200 px-4 py-2 font-semibold text-slate-800 transition hover:bg-slate-300"
-            (click)="closeCreateForm()"
+            class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+            (click)="closeCreateForm()" class="cursor-pointer"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-            [disabled]="createLoading()"
+            class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
+            [disabled]="createLoading() || (showCustomCargo() && !customCargo.trim())"
           >
             {{ createLoading() ? 'Salvando...' : 'Salvar colaborador' }}
           </button>
@@ -102,6 +128,7 @@
           <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Matricula</th>
           <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Cargo</th>
           <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
+          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Ações</th> <!-- Ações column is always present -->
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -110,11 +137,77 @@
             <td class="px-3 py-3 text-sm text-slate-800">{{ colaborador.nome }}</td>
             <td class="px-3 py-3 text-sm text-slate-700">{{ colaborador.matricula }}</td>
             <td class="px-3 py-3 text-sm text-slate-700">{{ formatarCargo(colaborador.cargo) }}</td>
-            <td class="px-3 py-3 text-sm font-medium" [class.text-emerald-700]="colaborador.ativo" [class.text-slate-500]="!colaborador.ativo">{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}</td>
+            <td class="px-3 py-3 text-sm font-medium" [class.text-emerald-700]="colaborador.ativo"
+              [class.text-slate-500]="!colaborador.ativo">{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}
+            </td>
+            <td class="px-3 py-3 text-sm">
+              <div class="flex gap-2">
+                @if (isAdmin) {
+                  @if (colaborador.ativo) {
+                    <button
+                      (click)="desativarColaborador(colaborador.id)"
+                      class="px-3 py-1 rounded-md bg-yellow-500 text-white text-xs font-semibold hover:bg-yellow-600 transition-colors cursor-pointer"
+                    >
+                      Desativar
+                    </button>
+                  }
+
+                  @if (!colaborador.ativo) {
+                    <button
+                      (click)="ativarColaborador(colaborador.id)"
+                      class="px-3 py-1 rounded-md bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition-colors cursor-pointer"
+                    >
+                      Ativar
+                    </button>
+                  }
+                  <button
+                    (click)="excluirColaborador(colaborador.id)"
+                    class="px-3 py-1 rounded-md bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors cursor-pointer"
+                  > 
+                    Excluir
+                  </button>
+                } @else if (isOperador || isGestor) {
+                  <button
+                    (click)="verHistoricoColaborador(colaborador)"
+                    class="px-3 py-1 rounded-md bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 transition-colors cursor-pointer"
+                  > 
+                    Ver Histórico
+                  </button>
+                }
+              </div>
+            </td>
           </tr>
         }
       </tbody>
     </table>
     </div>
+
+    @if (showColaboradorHistoryModal()) {
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Histórico de Acessos de {{ selectedColaboradorName() }}</h3>
+            <button (click)="closeColaboradorHistoryModal()" class="text-slate-500 hover:text-slate-700 cursor-pointer">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          @if (selectedColaboradorHistory().length === 0) {
+            <p class="text-sm text-slate-600">Nenhum registro de acesso encontrado.</p>
+          } @else {
+            <ul class="space-y-2 max-h-60 overflow-y-auto">
+              @for (registro of selectedColaboradorHistory(); track registro.id) {
+                <li class="p-2 border border-slate-200 rounded-md text-sm text-slate-700">
+                  <strong>{{ registro.tipo }}</strong> em <strong>{{ registro.area?.nome || 'Área Desconhecida' }}</strong>
+                  <span class="text-slate-500"> ({{ registro.timestamp | date: 'dd/MM/yyyy HH:mm' }})</span>
+                  @if (!registro.autorizado) {
+                    <span class="text-red-500 ml-2">(NEGADO)</span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    }
   }
 </main>

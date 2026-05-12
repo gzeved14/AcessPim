@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
 import { DataSource } from 'typeorm';
 import { appDataSource } from './config/appDataSource.js';
 import routes from './routes/index.js';
@@ -9,7 +8,9 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import 'reflect-metadata';
+import path from 'path';
 
+dotenv.config();
 const app = express();
 
 // Middleware de log global de requisições
@@ -56,6 +57,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     next(err);
 });
 app.use(errorHandler);
+
+app.use('/upload', express.static(path.resolve('upload')));
 
 appDataSource.initialize()
     .then(() => {

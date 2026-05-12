@@ -9,19 +9,18 @@
   gap: 1rem;
 }
 
-button {
-  border: 0;
-  border-radius: 0.4rem;
-  padding: 0.5rem 0.8rem;
-  background: #0f172a;
-  color: #ffffff;
-  cursor: pointer;
-}
+/* Estilos de botão removidos - usar classes Tailwind no HTML */
 
 button.secondary {
   background: #475569;
 }
 
+/* Regra adicionada para forçar a cor verde do botão,
+   caso o Tailwind CSS não esteja sendo aplicado corretamente. */
+.custom-green-button {
+  background-color: #059669 !important; /* Cor para emerald-600 */
+  color: #ffffff !important;
+}
 .feedback {
   margin-top: 1rem;
   color: #475569;

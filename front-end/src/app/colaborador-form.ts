@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ColaboradorService } from './core/services/colaborador.service';
 import { Colaborador } from './core/models/colaborador.model';
+import { CARGO_COLABORADOR_OPTIONS } from './core/types/CargoColaborador';
 
 @Component({
   selector: 'app-colaborador-form',
@@ -21,6 +22,7 @@ export class ColaboradorForm implements OnInit {
   loading = signal(false);
   errorMessage = signal('');
   isEditMode = signal(false);
+  showCustomCargo = signal(false);
   colaboradorId = '';
 
   @ViewChild('colaboradorForm') colaboradorForm!: NgForm;
@@ -28,10 +30,13 @@ export class ColaboradorForm implements OnInit {
   colaborador: Partial<Colaborador> = {
     nome: '',
     matricula: '',
-    cargo: 'Operador', // Valor padrão
+    cargo: '', // Valor padrão
     setor: '',
     ativo: true
   };
+
+  cargoOptions = CARGO_COLABORADOR_OPTIONS;
+  customCargo = '';
 
   ngOnInit(): void {
     this.colaboradorId = this.route.snapshot.paramMap.get('id') || '';
@@ -59,6 +64,11 @@ export class ColaboradorForm implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
+    // Se "Outros" foi selecionado, usar o cargo customizado
+    if (this.showCustomCargo() && this.customCargo.trim()) {
+      this.colaborador.cargo = this.customCargo.trim();
+    }
+
     const request$ = this.isEditMode() 
       ? this.colaboradorService.update(this.colaboradorId, this.colaborador)
       : this.colaboradorService.create(this.colaborador);
@@ -72,6 +82,16 @@ export class ColaboradorForm implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  onCargoChange(): void {
+    if (this.colaborador.cargo === 'Outros') {
+      this.showCustomCargo.set(true);
+      this.colaborador.cargo = '';
+    } else {
+      this.showCustomCargo.set(false);
+      this.customCargo = '';
+    }
   }
 
   cancelar(): void {

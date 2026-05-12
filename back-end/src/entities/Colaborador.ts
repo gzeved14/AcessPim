@@ -1,7 +1,7 @@
 // Importa funcionalidades de anotação/TypeORM de coluna, entidade, criação de Data Automática entre outros para definir schema.
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-// Puxa uma classe tipada Cargo que define se os valores da respectiva coluna são compatíveis.
-import { Cargo } from "../types/Cargo.js";
+// Puxa a enum de cargos dos colaboradores (funcionários da planta).
+import { CargoColaborador } from "../types/CargoColaborador.js";
 import { JoinColumn } from "typeorm";
 // Usa type imports para fazer as tipagens de Area e RegistroAcesso de modo a evitar referências circulares em relacionamentos do TypeScript.
 import type { Area } from "./Area.js";
@@ -26,9 +26,9 @@ export class Colaborador {
     @Column({ type: 'text', nullable: false })
     setor!: string;
 
-    // Coluna descritiva de qual cargo hierarquicamente formatado esse Colaborador atua e obedece as exigências da estrutura tipada Cargo (ex. Admin, Gerente, Peao).
+    // Coluna descritiva de qual cargo hierarquicamente formatado esse Colaborador atua e obedece as exigências da estrutura tipada CargoColaborador (ex. Técnico, Engenheiro).
     @Column({ type: 'text', nullable: false })
-    cargo!: Cargo;
+    cargo!: CargoColaborador;
 
     // Define em banco uma chave bool (0 ou 1 / true ou false), que na criação adquire valor true se nada foi dito por parte do cliente da api.
     @Column({ type: 'boolean', default: true, nullable: false })

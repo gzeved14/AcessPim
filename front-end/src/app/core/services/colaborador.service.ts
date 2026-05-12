@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Colaborador } from '../models/colaborador.model';
@@ -13,9 +13,13 @@ export class ColaboradorService {
   constructor(private http: HttpClient) { }
 
   // US07: Listagem com busca (opcional passar filtros por query params)
-  getColaboradores(): Observable<Colaborador[]> {
+  getColaboradores(timestamp?: number): Observable<Colaborador[]> {
+    let params = new HttpParams();
+    if (timestamp) {
+      params = params.set('timestamp', timestamp.toString());
+    }
     // Busca todos os colaboradores para listagem e selects.
-    return this.http.get<Colaborador[]>(this.API);
+    return this.http.get<Colaborador[]>(this.API, { params });
   }
 
   // Busca um colaborador pelo id.
@@ -36,8 +40,12 @@ export class ColaboradorService {
   }
 
   // US08: Alternar status ativo/inativo (sem deletar histórico)
-  toggleStatus(id: string): Observable<void> {
+  softDelete(id: string): Observable<void> {
     // Altera apenas o status sem remover o historico.
     return this.http.patch<void>(`${this.API}/${id}/toggle-status`, {});
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API}/${id}`);
   }
 }

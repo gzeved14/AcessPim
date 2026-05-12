@@ -34,13 +34,24 @@
 
       <div class="flex flex-col gap-2">
         <label for="cargo" class="font-semibold text-slate-400">Cargo</label>
-        <select id="cargo" name="cargo" [(ngModel)]="colaborador.cargo" required
+        <select id="cargo" name="cargo" [(ngModel)]="colaborador.cargo" (change)="onCargoChange()" required
           class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
-          <option value="Administrador">Administrador</option>
-          <option value="Gestor">Gestor de Área</option>
-          <option value="Operador">Operador de Segurança</option>
+          <option value="" disabled>Selecione um cargo</option>
+          @for (cargo of cargoOptions; track cargo) {
+            <option [value]="cargo">{{ cargo }}</option>
+          }
+          <option value="Outros">Outros</option>
         </select>
       </div>
+
+      @if (showCustomCargo()) {
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <label for="customCargo" class="font-semibold text-slate-400">Digite o cargo</label>
+          <input type="text" id="customCargo" name="customCargo" [(ngModel)]="customCargo" required 
+            placeholder="Ex: Técnico Especializado, Operador Sênior, etc..."
+            class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
+        </div>
+      }
     </div>
 
     <div class="flex flex-col gap-2">
@@ -54,7 +65,7 @@
         class="px-5 py-2.5 rounded bg-transparent border border-[#313D4A] text-slate-300 hover:bg-[#313D4A] cursor-pointer font-semibold transition-colors">
         Cancelar
       </button>
-      <button type="submit" [disabled]="loading() || form.invalid" 
+      <button type="submit" [disabled]="loading() || form.invalid || (showCustomCargo() && !customCargo.trim())" 
         class="px-5 py-2.5 rounded bg-teal-400 text-gray-900 border-none hover:bg-teal-500 cursor-pointer font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 items-center">
         @if (loading()) {
           <i class="fa fa-spinner fa-spin"></i>

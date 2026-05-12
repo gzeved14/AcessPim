@@ -25,6 +25,7 @@ export class Areas implements OnInit {
 
   ngOnInit(): void {
     // Carrega areas assim que o componente for iniciado.
+    console.log('Perfil atual:', this.authService.currentPerfil());
     this.loadAreas();
   }
 
@@ -105,6 +106,26 @@ export class Areas implements OnInit {
       });
     }
   }
+
+  hardDelete(id: string): void {
+    if (confirm('ATENÇÃO: Tem certeza que deseja EXCLUIR PERMANENTEMENTE esta área? Esta ação não pode ser desfeita e removerá todos os registros associados a ela.')) {
+      this.loading.set(true);
+      this.errorMessage.set('');
+      this.areaService.hardDelete(id).subscribe({
+        next: () => {
+          // Recarrega a lista para remover a área excluída da tela
+          this.loadAreas();
+        },
+        error: (err: unknown) => {
+          this.errorMessage.set(
+            err instanceof Error ? err.message : 'Erro ao tentar excluir a área permanentemente.'
+          );
+          this.loading.set(false);
+        }
+      });
+    }
+  }
+
 
   onTestClick(): void {
     alert('Botão de teste clicado!');
