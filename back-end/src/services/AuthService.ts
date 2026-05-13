@@ -75,7 +75,7 @@ export class AuthService {
         // Busca o usuário. O select garante que a senha_hash venha na query
         const user = await this.userRepo.findOne({
             where: { email: normalizedEmail },
-            select: ["id", "nome", "email", "senha_hash", "cargo", "matricula"] 
+            select: ["id", "nome", "email", "senha_hash", "cargo", "matricula", "setor"] 
         });
         // Se o usuário não for encontrado, lança um erro de credenciais inválidas.
         if (!user) {
@@ -97,7 +97,9 @@ export class AuthService {
                 id: user.id,
                 nome: user.nome,
                 email: user.email,
-                cargo: user.cargo
+                cargo: user.cargo,
+                matricula: user.matricula,  // adicione
+                setor: user.setor    
             }
         };
     }

@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import cors from 'cors';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -47,6 +48,11 @@ app.use((req, res, next) => {
     )
     .catch(next);
 });
+
+app.use(cors({
+  origin: ['https://accesspim.dev', 'http://localhost:4200'], // Adicione o domínio oficial aqui
+  credentials: true
+}));
 
 /**
  * Start the server if this module is the main entry point, or it is ran via PM2.

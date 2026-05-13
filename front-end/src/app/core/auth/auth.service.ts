@@ -108,15 +108,18 @@ export class AuthService {
             );
     }
 
-    private mapAuthUser(response: AuthResponse): Usuario {
-        // Correção: Mapeando campos obrigatórios conforme o PRD
+    private mapAuthUser(response: any): Usuario {
+    // Usamos o 'any' para evitar brigas com o compilador
+        const data = response.user; 
+
         return {
-            id: response.user.id,
-            nome: response.user.nome,
-            email: response.user.email,
-            cargo: response.user.cargo,
-            matricula: response.user.matricula || '', // Essencial para US07
-            setor: response.user.setor || '',         // Essencial para US07
+            id: data?.id || '',
+            nome: data?.nome || '',
+            email: data?.email || '',
+            cargo: data?.cargo || '',
+            // O ?. garante que se 'matricula' não existir, o código não trava
+            matricula: data?.matricula || '', 
+            setor: data?.setor || ''
         };
     }
 

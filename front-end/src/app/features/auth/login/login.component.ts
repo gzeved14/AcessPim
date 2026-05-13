@@ -39,12 +39,13 @@ export class LoginComponent {
 		
 		this.authService.login(normalizedEmail, password).subscribe({
 			next: (session) => {
-				// Grava a sessao antes de ir para o dashboard para o guard reconhecer o usuario.
+				console.log('Login sucesso:', session);
 				this.authService.setSession(session);
 				this.loading.set(false);
 				this.router.navigate(['/dashboard'], { replaceUrl: true });
 			},
-			error: () => {
+			error: (err) => {
+				console.error('Login erro:', err);
 				this.loading.set(false);
 				this.errorMessage.set('Falha no login. Verifique suas credenciais.');
 			},

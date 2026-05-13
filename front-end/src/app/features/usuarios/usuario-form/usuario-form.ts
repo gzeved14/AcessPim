@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/auth/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-usuario-form',
@@ -43,7 +44,7 @@ export class UsuarioForm implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.post('http://localhost:3000/usuario', this.usuario).subscribe({
+    this.http.post(`${environment.apiUrl}/usuario`, this.usuario).subscribe({
       next: () => {
         alert('Usuário cadastrado com sucesso!');
         this.router.navigate(['/dashboard']);

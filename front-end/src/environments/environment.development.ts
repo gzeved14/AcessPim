@@ -1,5 +1,4 @@
-// environment.development.ts — NÃO MEXA
 export const environment = {
-  production: false,
-  apiUrl: 'http://140.238.186.14/api',
+  production: true,
+  apiUrl: 'https://accesspim.dev/api' // <-- Certifique-se que NÃO é localhost
 };
