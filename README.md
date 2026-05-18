@@ -44,5 +44,6 @@ Ao executar o script da catraca, voce vera um menu no terminal:
 * **Digitar 1**: Simula um funcionario autorizado. O script validara o acesso localmente, enviara o sinal de abertura do hardware e, em seguida, sincronizara o log com o servidor.
 * **Digitar 0**: Simula um acesso negado. A catraca permanecera travada e o registro de tentativa de invasao sera enviado para a nuvem.
 
-## Diferencial Tecnico Demonstrado
+## Diferencial Tecnico até agora
+
 A simulacao prova que a decisao de abertura da porta ocorre na borda (Edge), garantindo que, mesmo em caso de falha de conexao com o servidor central, a operacao da fabrica nao seja interrompida, mantendo os registros em cache local para sincronizacao posterior.
