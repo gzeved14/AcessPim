@@ -42,7 +42,7 @@ Com o servidor rodando, abra um **novo terminal** para simular o dispositivo fis
 ### 4. Interacao no Simulador
 Ao executar o script da catraca, voce vera um menu no terminal:
 * **Digitar 1**: Simula um funcionario autorizado. O script validara o acesso localmente, enviara o sinal de abertura do hardware e, em seguida, sincronizara o log com o servidor.
-* **Digitar 0**: Simula um acesso negado. A catraca permanecera travada e o registro de tentativa de invasao sera enviado para a nuvem..
+* **Digitar 0**: Simula um acesso negado. A catraca permanecera travada e o registro de tentativa de invasao sera enviado para a nuvem.
 
 ## Diferencial Tecnico até agora
 
