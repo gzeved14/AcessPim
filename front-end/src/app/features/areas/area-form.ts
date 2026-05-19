@@ -51,7 +51,7 @@ export class AreaForm implements OnInit {
   loadResponsaveis(): void {
     this.colaboradorService.getColaboradores().subscribe({
       next: (colaboradores) => {
-        this.responsaveis.set(colaboradores.filter(c => c.cargo === 'GESTOR_DE_AREA' || c.cargo === 'ADMIN')); // Filtra por cargos relevantes
+        this.responsaveis.set(colaboradores); // Exibe todos os colaboradores como possíveis responsáveis
       },
       error: (err: HttpErrorResponse) => {
         this.errorMessage.set(err.error?.message || err.message || 'Erro ao carregar responsáveis.');

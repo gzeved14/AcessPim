@@ -1,0 +1,36 @@
+# 1. Estágio de Compilação (Build)
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+# Copia apenas os arquivos de dependências primeiro (otimiza o cache do Docker)
+COPY package*.json ./
+
+# Instala todas as dependências (incluindo as de desenvolvimento para compilar o TS)
+RUN npm ci
+
+# Copia o restante dos arquivos do código fonte
+COPY . .
+
+# Compila o TypeScript para JavaScript (gera a pasta dist/ ou build/)
+RUN npm run build
+
+# Remove dependências de desenvolvimento para deixar a imagem leve
+RUN npm prune --production
+
+# 2. Estágio de Execução (Runtime)
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Copia apenas o que é estritamente necessário do estágio de build
+COPY package*.json ./
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/dist ./dist
+# Se você tiver a pasta de uploads local e quiser que ela persista:
+COPY --from=builder /usr/src/app/upload ./upload
+
+EXPOSE 3000
+
+# Comando para rodar a aplicação compilada
+CMD ["node", "dist/server.js"]

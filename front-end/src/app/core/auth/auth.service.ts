@@ -13,7 +13,7 @@ interface AuthState {
     accessToken: string | null;
 }
 
-// Interfaces internas para melhor controle de tipos
+// Interface para resposta de login
 interface LoginResponse {
     accessToken: string;
     refreshToken: string;
@@ -39,12 +39,13 @@ export class AuthService {
         this.hydrateSessionFromStorage();
     }
 
-    // Selectors reativos usando Signals
+
+    // Selectors reativos para autenticação e usuário
     isAuthenticated = computed(() => !!this.state().accessToken);
     currentUser = computed(() => this.state().usuario);
     accessToken = computed(() => this.state().accessToken);
-    
-    // US09: Facilita a verificação de permissões para áreas restritas
+
+    // Facilita a verificação de permissões para áreas restritas
     currentPerfil = computed<Perfil | null>(() => {
         const cargo = this.state().usuario?.cargo;
         return this.toPerfil(cargo);

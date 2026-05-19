@@ -1,62 +1,45 @@
-// Importa os injetores do banco de dados do TypeORM para os Repositórios.
 import { Repository, DataSource } from "typeorm";
-// Importa a entidade foco deste script, bem como módulo de gestão de exceções de requisição.
 import { Colaborador } from "../entities/Colaborador.js";
 import { AppError } from "../errors/AppError.js";
 
 /**
- * @class ColaboradorService
- * @description Serviço responsável por prover e abstrair as lógicas de negócio do domínio Colaborador
- * para que os controllers sejam mais limpos.
+ * Serviço responsável pelas regras de negócio do domínio Colaborador.
+ * Abstrai operações para manter controllers mais limpos.
  */
-// Serviço responsável por prover e abstrair as lógicas de negócio do domínio Colaborador para que os controllers sejam mais limpos.
 export class ColaboradorService {
-    // Variável encapsulada que vai segurar os métodos do banco de dados providos pelo Repository do TypeORM.
+    // Repositório do TypeORM para a entidade Colaborador
     private repo: Repository<Colaborador>;
 
-    // O construtor recebe a conexão do banco de dados (DataSource) e inicializa o repositório da entidade.
-    // Passa a base de dados de controle no momento de iniciar essa classe e pega seu repositório especifico.
+    /**
+     * Inicializa o serviço com o repositório da entidade Colaborador
+     */
     constructor(dataSource: DataSource) {
         this.repo = dataSource.getRepository(Colaborador);
     }
     /**
-     * @method findAll
-     * @description Retorna todos os colaboradores cadastrados, ordenados por nome (RF22).
-     * @returns Promise<Colaborador[]> - Uma lista de colaboradores.
+     * Retorna todos os colaboradores cadastrados, ordenados por nome.
      */
-    //Retornar todos os colaboradores cadastrados para a Tela 3.
-    async findAll(){ 
-        // Lista todas as informações de colaborador, trazendo com instrução de ORDENAÇÃO ASCENDENTE para o "nome" na query SQL gerada.
-        return await this.repo.find({
-            order: { nome:  "ASC"}
-        });
+    async findAll(){
+        return await this.repo.find({ order: { nome:  "ASC" } });
     }
     /**
-     * @method create
-     * @description Valida a matrícula única e persiste um novo colaborador (RF23).
-     * @param dados - Os dados do novo colaborador.
-     * @returns Promise<Colaborador> - O colaborador recém-criado.
-     * @throws AppError se o nome/matrícula forem ausentes ou a matrícula já existir.
+     * Cria um novo colaborador após validar unicidade da matrícula.
+     * @throws AppError se nome/matrícula ausentes ou matrícula já existente.
      */
-    //Validar matrícula única e persistir o novo colaborador
     async create(dados: Partial<Colaborador>){
-        // Confirma integridade: proibe um save em branco se o nome e matricula de quem vai ser salvo não tiver vindo no parametro.
         if (!dados.nome || !dados.matricula){
             throw new AppError("Nome e matricula são obrigatórios", 400);
         }
-        // Garante que a matrícula seja única na empresa (RF23).
-        // Busca na tabela se já existe registro atrelado a matrícula nova requerida.
+        // Verifica unicidade da matrícula
         const registrationExists = await this.repo.findOneBy({matricula: dados.matricula});
         if (registrationExists){
             throw new AppError("Esta matrícula ja está cadastrada no sistema", 400);
         }
-        // Cadastra novo colaborador com status ativo por padrão (RF23).
-        // Adiciona as novas características dos dados recebidos no corpo e por regra de negócio padroniza forçadamente para 'ativo' verdadeiro na hora da criação.
+        // Cria colaborador com status ativo por padrão
         const newColaborador = this.repo.create({
             ...dados,
             ativo: true
         });
-        // Dispara o SQL INSERT no banco de dados.
         return await this.repo.save(newColaborador);
     }
     /**

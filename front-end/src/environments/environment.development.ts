@@ -1,4 +1,4 @@
 export const environment = {
-  production: true,
+  production: false,
   apiUrl: 'https://accesspim.dev/api' // <-- Certifique-se que NÃO é localhost
 };

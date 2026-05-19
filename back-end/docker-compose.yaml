@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Serviço da nossa API Node.js
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: accesspim-backend
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - DB_HOST=db
+      - DB_PORT=5432 # Porta interna do container do banco
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - accesspim-uploads:/usr/src/app/upload
+    depends_on:
+      db:
+        condition: service_healthy # Só liga a API quando o banco estiver pronto
+
+  # Serviço do Banco de Dados PostgreSQL (Adeus instalar Postgres no Windows/Linux!)
+  db:
+    image: postgres:15-alpine
+    container_name: accesspim-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5435:5432" # Expõe a porta 5435 para você acessar do seu DBeaver/pgAdmin local
+    volumes:
+      - accesspim-db-data:/var/lib/postgresql/data
+    healthcheck: # O "Health Check" profissional que o professor sugeriu no item 5.2!
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  accesspim-db-data:
+  accesspim-uploads:

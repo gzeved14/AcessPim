@@ -10,16 +10,15 @@ interface LoginMeta {
     userAgent: string;
 }
 /**
- * @class AuthService
- * @description Serviço responsável por gerenciar a autenticação de usuários,
- * incluindo login, geração/validação de tokens JWT e logout.
+ * Serviço responsável pela autenticação de usuários, geração/validação de tokens JWT e logout.
  */
 export class AuthService {
     private userRepo: Repository<Usuario>;
     private tokenBlacklistService: TokenBlacklistService;
 
-    // O construtor recebe a conexão do banco de dados (DataSource) e inicializa
-    // o repositório de usuários e o serviço de blacklist de tokens.
+    /**
+     * Inicializa o serviço com o repositório de usuários e o serviço de blacklist de tokens.
+     */
     constructor(dataSource: DataSource) {
         this.userRepo = dataSource.getRepository(Usuario);
         this.tokenBlacklistService = new TokenBlacklistService(dataSource);
@@ -70,26 +69,25 @@ export class AuthService {
      * @throws AppError se as credenciais forem inválidas.
      */
     async login(email: string, password: string, meta: LoginMeta) {
-        // Normaliza o email para reduzir falhas por espaços e diferença de caixa.
+        // Normaliza o email para evitar falhas por espaços e caixa.
         const normalizedEmail = email.trim().toLowerCase();
-        // Busca o usuário. O select garante que a senha_hash venha na query
+        // Busca o usuário e garante que senha_hash venha na query
         const user = await this.userRepo.findOne({
             where: { email: normalizedEmail },
             select: ["id", "nome", "email", "senha_hash", "cargo", "matricula", "setor"] 
         });
-        // Se o usuário não for encontrado, lança um erro de credenciais inválidas.
         if (!user) {
             throw new AppError("Credenciais inválidas", 401); 
         }
-        // Compara a senha fornecida com o hash armazenado.
+        // Compara a senha fornecida com o hash armazenado
         const isPasswordValid = await compare(password, user.senha_hash);
         if (!isPasswordValid) {
             throw new AppError("Credenciais inválidas", 401);
         }
-        // Gera os tokens de acesso e refresh.
+        // Gera tokens de acesso e refresh
         const accessToken = this.generateAccessToken(user);
         const refreshToken = this.generateRefreshToken(user);
-        // Retorna os tokens e informações básicas do usuário.
+        // Retorna tokens e informações básicas do usuário
         return { 
             accessToken, 
             refreshToken, 

@@ -7,9 +7,11 @@ import { validateBody } from '../middleware/validateBody.js';
 import { CreateUserSchemaDTO, updateUserSchema } from '../dtos/CreateUserSchemaDTO.js';
 // O serviço que conterá os métodos atrelados da base que retornam e escrevem banco na base.
 import { UsuarioService } from '../services/UsuarioService.js';
+import { ensureAuth } from '../middleware/authMiddleware.js'
 
 // Transforma "userRoutes" num agrupador configurável nativo de rotas express.
 const userRoutes = Router();
+userRoutes.use(ensureAuth);
 
 // Injeta as definições do DataSource em UsuarioService habilitando acesso de rede por trás dos panos.
 const userService = new UsuarioService(appDataSource);

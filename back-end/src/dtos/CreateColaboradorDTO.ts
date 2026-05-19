@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { CargoColaborador } from "../types/CargoColaborador.js";
+import { Cargo } from "../types/Cargo.js";
 
 export const createColaboradorSchema = z.object({
-    nome: z.string().min(3),
-    matricula: z.string().min(2),
-    cargo: z.string().min(3, "Cargo deve ter pelo menos 3 caracteres"),
-    setor: z.string(),
-    foto_url: z.string().url().optional().nullable()
+    nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
+    matricula: z.string().min(2, "A matrícula deve ter pelo menos 2 caracteres"),
+    cargo: z.enum(Cargo),
+    setor: z.string().min(1, "O setor é obrigatório"),
+    foto_url: z.string().url("A foto deve ser uma URL válida").optional().nullable()
 });
 
 export const createColaboradorSchemaDTO = createColaboradorSchema;
