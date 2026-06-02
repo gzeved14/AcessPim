@@ -1,65 +1,94 @@
+# -*- coding: utf-8 -*-
+import cv2
 import requests
 import time
 
 # URL do seu servidor Node.js local
 URL_SERVIDOR = "http://localhost:3000/api/registro"
 
-def processar_acesso(matricula, nome, area, permitido):
-    print(f"\n[EDGE] Processando biometria de: {nome}...")
-    time.sleep(1) # Simula o processamento na borda
-    
-    if permitido:
-        status = "Autorizado"
-        print(f"[SUCESSO] ACESSO LIBERADO! Bem-vindo(a), {nome}.")
-        print("[HARDWARE] Enviando sinal para destravar solenoide da catraca...")
-    else:
-        status = "Negado"
-        print(f"[NEGADO] ACESSO NEGADO! Funcionario {nome} sem permissao para esta area.")
-        print("[HARDWARE] Mantendo catraca travada.")
+print("[EDGE] Inicializando modelos de Visão Computacional (Haar Cascade)...")
 
-    # Sincronizacao com o Servidor Central (Nuvem)
-    payload = {
-        "matricula": matricula,
-        "area": area,
-        "status": status
-    }
-    
-    try:
-        print(f"\n[EDGE] Sincronizando registro com a Nuvem...")
-        resposta = requests.post(URL_SERVIDOR, json=payload)
+# Carrega o classificador nativo do OpenCV (já vem instalado com o pip install opencv-python)
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Inicializa a Captura da Webcam
+video_capture = cv2.VideoCapture(0)
+
+if not video_capture.isOpened():
+    print("[ERRO] Não foi possível abrir a webcam do notebook.")
+    exit()
+
+print("\n" + "="*50)
+print("      SISTEMA DE ACESSO ATIVO — VISÃO COMPUTACIONAL      ")
+print("  DICA DE CONTROLE:")
+print("  Pressione 'A' no teclado para simular AUTORIZADO (Gabriel)")
+print("  Pressione 'N' no teclado para simular NEGADO (Estranho)")
+print("  Pressione 'Q' na janela da câmera para fechar.")
+print("="*50 + "\n")
+
+ultimo_envio = 0
+modo_simulado = "Autorizado"
+nome_usuario = "Gabriel"
+matricula_atual = "MAT002"
+
+while True:
+    ret, frame = video_capture.read()
+    if not ret:
+        break
+
+    # Efeito espelho para o movimento ficar natural na tela
+    frame = cv2.flip(frame, 1)
+
+    # O Haar Cascade exige escala de cinza
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Detecta as coordenadas de qualquer rosto na tela
+    rostos = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+
+    # Verifica se você pressionou alguma tecla com a janela da câmera em foco
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('a'):
+        modo_simulado = "Autorizado"
+        nome_usuario = "Gabriel"
+        matricula_atual = "MAT002"
+        print("[EDGE] Modo alterado para: GABRIEL (AUTORIZADO)")
+    elif key == ord('n'):
+        modo_simulado = "Negado"
+        nome_usuario = "Desconhecido"
+        matricula_atual = "MAT_UNK"
+        print("[EDGE] Modo alterado para: DESCONHECIDO (NEGADO)")
+    elif key == ord('q'):
+        break
+
+    for (x, y, w, h) in rostos:
+        # Verde para autorizado, Vermelho para negado
+        cor = (0, 255, 16) if modo_simulado == "Autorizado" else (0, 0, 255)
         
-        if resposta.status_code == 201:
-            print(f"[NUVEM] Resposta: {resposta.json()['mensagem']}")
-        else:
-            print(f"[NUVEM] Erro no servidor: {resposta.status_code}")
+        # Desenha a caixa ao redor do rosto detectado
+        cv2.rectangle(frame, (x, y), (x+w, y+h), color=cor, thickness=2)
+        cv2.putText(frame, f"{nome_usuario} ({modo_simulado})", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, cor, 2)
+
+        # Envio assíncrono temporizado para a API (1 a cada 5 segundos)
+        agora = time.time()
+        if agora - ultimo_envio > 5:
+            ultimo_envio = agora
+            payload = {
+                "matricula": matricula_atual,
+                "area": "Sala de Servidores",
+                "status": modo_simulado
+            }
+            print(f"\n[EDGE] Rosto Processado na Borda: {nome_usuario}")
             
-    except requests.exceptions.ConnectionError:
-        print("[ALERTA] Servidor Offline. Registro salvo em cache local (Tolerancia a Falhas).")
+            try:
+                print(f"[EDGE] Despachando log para o servidor central...")
+                resposta = requests.post(URL_SERVIDOR, json=payload, timeout=2)
+                print(f"[NUVEM] Resposta obtida: {resposta.status_code}")
+            except requests.exceptions.ConnectionError:
+                print("[ALERTA] Servidor central offline. Salvando dados em cache local.")
 
-def menu_simulacao():
-    print("="*50)
-    print("      SIMULADOR DE ACESSO - EDGE COMPUTING      ")
-    print("="*50)
-    
-    while True:
-        print("\n--- TESTE DE ACESSO ---")
-        print("[1] Simular Funcionario PERMITIDO (Joao)")
-        print("[0] Simular Funcionario NEGADO (Estranho)")
-        print("[S] Sair do Simulador")
-        
-        opcao = input("\nDigite o comando: ").upper()
-        
-        if opcao == '1':
-            processar_acesso("MAT001", "Joao Silva", "Sala de Servidores", True)
-        elif opcao == '0':
-            processar_acesso("MAT_UNK", "Desconhecido", "Sala de Servidores", False)
-        elif opcao == 'S':
-            print("Encerrando simulador...")
-            break
-        else:
-            print("Opcao invalida!")
-        
-        print("\n" + "-"*30)
+    # Renderiza o feed da webcam na janela nativa
+    cv2.imshow('AccessPIM AI - Hardware de Borda (OpenCV)', frame)
 
-if __name__ == "__main__":
-    menu_simulacao()
+video_capture.release()
+cv2.destroyAllWindows()
+print("[EDGE] Script encerrado.")
