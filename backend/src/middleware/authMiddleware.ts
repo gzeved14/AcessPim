@@ -3,11 +3,11 @@ import type { RequestHandler } from "express";
 // Importa biblioteca "jsonwebtoken" para descriptografar/validar tokens e ler seus dados.
 import jwt, { type JwtPayload } from "jsonwebtoken";
 // Importa classe de modelo de tratativa de erros e códigos customizados.
-import { AppError } from "../errors/AppError.js";
+import { AppError } from "../errors/AppError";
 // Importa serviço que lida com invalidação (Blacklist) de chaves antigas.
-import { TokenBlacklistService } from "../services/TokenBlacklistService.js"
+import { TokenBlacklistService } from "../services/TokenBlacklistService"
 // Importa configurações da conexão principal do TypeORM.
-import { appDataSource } from "../config/appDataSource.js"
+import { appDataSource } from "../config/appDataSource"
 
 // Criação de rotina auxiliar que vai ler do arquivo ".env" qual a chave secreta dos JWT da plataforma.
 const getAccessSecret = () => {

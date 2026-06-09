@@ -1,12 +1,12 @@
 import { DataSource } from "typeorm";
 import dotenv from 'dotenv';
-import { Area } from "../entities/Area.js";
-import { Autorizacao } from "../entities/Autorizacao.js";
-import { Colaborador } from "../entities/Colaborador.js";
-import { RegistroAcesso } from "../entities/RegistroAcesso.js";
-import { TokenBlacklist } from "../entities/TokenBlacklist.js";
-import { Usuario } from "../entities/Usuario.js";
-import { env } from './env.js';
+import { Area } from "../entities/Area";
+import { Autorizacao } from "../entities/Autorizacao";
+import { Colaborador } from "../entities/Colaborador";
+import { RegistroAcesso } from "../entities/RegistroAcesso";
+import { TokenBlacklist } from "../entities/TokenBlacklist";
+import { Usuario } from "../entities/Usuario";
+import { env } from './env';
 
 dotenv.config();
 

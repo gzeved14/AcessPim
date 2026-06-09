@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from "typeorm";
 import { JoinColumn } from "typeorm";
-import { Tipo } from "../types/Tipo.js";
-import type { Colaborador } from "./Colaborador.js";
-import type { Area } from "./Area.js";
-import type { Usuario } from "./Usuario.js";
+import { Tipo } from "../types/Tipo";
+import type { Colaborador } from "./Colaborador";
+import type { Area } from "./Area";
+import type { Usuario } from "./Usuario";
 
 @Entity("registro_acesso")
 export class RegistroAcesso {

@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { ColaboradorService } from "../services/ColaboradorService.js"
-import { AppError } from "../errors/AppError.js";
+import { ColaboradorService } from "../services/ColaboradorService"
+import { AppError } from "../errors/AppError";
 
 /**
  * @class ColaboradorController

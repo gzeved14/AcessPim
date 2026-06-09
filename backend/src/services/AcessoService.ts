@@ -1,13 +1,13 @@
 // Importa utilitários do TypeORM para lidar com persistência de dados no banco de dados e aplicar filtros em consultas.
 import { Repository, DataSource, Between, ILike, In } from "typeorm";
 // Importa entidades necessárias do banco de dados e os tipos de suporte e tratamento de erro.
-import { RegistroAcesso } from "../entities/RegistroAcesso.js";
-import { AppError } from "../errors/AppError.js";
-import { Colaborador } from "../entities/Colaborador.js";
-import { Area } from "../entities/Area.js";
-import { Usuario } from "../entities/Usuario.js";
-import { Autorizacao } from "../entities/Autorizacao.js";
-import { Tipo } from "../types/Tipo.js";
+import { RegistroAcesso } from "../entities/RegistroAcesso";
+import { AppError } from "../errors/AppError";
+import { Colaborador } from "../entities/Colaborador";
+import { Area } from "../entities/Area";
+import { Usuario } from "../entities/Usuario";
+import { Autorizacao } from "../entities/Autorizacao";
+import { Tipo } from "../types/Tipo";
 
 // Interface que define a estrutura de dados esperada no input para registrar um novo acesso.
 interface RegisterAccessInput {

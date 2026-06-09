@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Cargo } from "../types/Cargo.js";
+import { Cargo } from "../types/Cargo";
 
 export const createColaboradorSchema = z.object({
     nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),

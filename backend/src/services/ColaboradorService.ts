@@ -1,6 +1,6 @@
 import { Repository, DataSource } from "typeorm";
-import { Colaborador } from "../entities/Colaborador.js";
-import { AppError } from "../errors/AppError.js";
+import { Colaborador } from "../entities/Colaborador";
+import { AppError } from "../errors/AppError";
 
 /**
  * Serviço responsável pelas regras de negócio do domínio Colaborador.
@@ -52,7 +52,7 @@ export class ColaboradorService {
     //Buscar detalhes para edição na Tela 4
     async findById(id: string){
         // Executa uma pesquisa buscando no DB estritamente pela chave ID especificada por parametro da função.
-        const colaborador = await this.repo.findOneBy({id: id as any});
+        const colaborador = await this.repo.findOneBy({id});
         // Retorna um status de objeto Não Encontrado (Erro 404) caso o banco não retorne ninguém em sua respectiva query.
         if(!colaborador ){
             throw new AppError("Colaborador não encontrado",404);
@@ -80,8 +80,6 @@ export class ColaboradorService {
         // Atualiza os campos do colaborador sem deletar para manter rastreabilidade.
         // Combina usando lógica de objetos e sobrescreve as configurações anteriores do "colaborador" local pelo valor mais recente dos "dados".
         Object.assign(colaborador, dados);
-        console.log(`[ColaboradorService] Update - Colaborador ID: ${id}, Dados recebidos:`, dados);
-        console.log(`[ColaboradorService] Update - Colaborador.ativo antes de salvar: ${colaborador.ativo}`);
         // Salva as alterações no banco de dados.
         return await this.repo.save(colaborador);
     }

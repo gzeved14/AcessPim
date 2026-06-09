@@ -1,9 +1,9 @@
 import { Repository, DataSource } from "typeorm";
 import { compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Usuario } from "../entities/Usuario.js"; 
-import { AppError } from "../errors/AppError.js";
-import { TokenBlacklistService } from "../services/TokenBlacklistService.js"
+import { Usuario } from "../entities/Usuario"; 
+import { AppError } from "../errors/AppError";
+import { TokenBlacklistService } from "../services/TokenBlacklistService"
 
 interface LoginMeta {
     ip: string;

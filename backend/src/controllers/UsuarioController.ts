@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import type { UsuarioService } from "../services/UsuarioService.js";
-import { AppError } from "../errors/AppError.js";
+import type { UsuarioService } from "../services/UsuarioService";
+import { AppError } from "../errors/AppError";
 
 /**
  * @class UsuarioController

@@ -1,11 +1,11 @@
 // Importa funcionalidades de anotação/TypeORM de coluna, entidade, criação de Data Automática entre outros para definir schema.
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 // Puxa a enum de cargos dos colaboradores (funcionários da planta).
-import { Cargo } from "../types/Cargo.js";
+import { Cargo } from "../types/Cargo";
 import { JoinColumn } from "typeorm";
 // Usa type imports para fazer as tipagens de Area e RegistroAcesso de modo a evitar referências circulares em relacionamentos do TypeScript.
-import type { Area } from "./Area.js";
-import type { RegistroAcesso } from "./RegistroAcesso.js";
+import type { Area } from "./Area";
+import type { RegistroAcesso } from "./RegistroAcesso";
 
 // Especifica e conecta a Classe com a Tabela correspondente "colaborador" dentro do banco relacional PostgreSQL.
 @Entity("colaborador")

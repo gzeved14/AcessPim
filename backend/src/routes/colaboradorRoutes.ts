@@ -1,15 +1,18 @@
 import { Router } from 'express';
-import { appDataSource } from '../config/appDataSource.js'
-import { ColaboradorService } from '../services/ColaboradorService.js'
-import  ColaboradorController  from '../controllers/ColaboradorController.js'
-import { ensureAuth } from '../middleware/authMiddleware.js'
-import  { createColaboradorSchemaDTO, updateColaboradorSchema }  from '../dtos/CreateColaboradorDTO.js'
-import { validateBody } from '../middleware/validateBody.js';
-import { upload } from '../config/upload.js'; // 1. Importe o Multer configurado
+import { appDataSource } from '../config/appDataSource'
+import { ColaboradorService } from '../services/ColaboradorService'
+import  ColaboradorController  from '../controllers/ColaboradorController'
+import { ensureAuth } from '../middleware/authMiddleware'
+import  { createColaboradorSchemaDTO, updateColaboradorSchema }  from '../dtos/CreateColaboradorDTO'
+import { validateBody } from '../middleware/validateBody';
+import { uploadConfig } from '../config/upload';
+import multer from 'multer';
 
 const colaboradorRoutes = Router();
 const colaboradorService = new ColaboradorService(appDataSource);
 const colaboradorController = new ColaboradorController(colaboradorService);
+
+const upload = multer(uploadConfig);
 
 colaboradorRoutes.use(ensureAuth);
 
@@ -20,11 +23,10 @@ colaboradorRoutes.put('/:id', validateBody(updateColaboradorSchema), colaborador
 colaboradorRoutes.patch('/:id/toggle-status', colaboradorController.softDelete.bind(colaboradorController));
 colaboradorRoutes.delete('/:id', colaboradorController.delete.bind(colaboradorController));
 
-// 2. Nova rota para Upload de Foto (PATCH)
-// O upload.single('foto') diz ao Express para esperar um arquivo no campo chamado "foto"
+// 🎯 Rota de Upload de Foto atualizada usando a instância criada acima
 colaboradorRoutes.patch(
     '/:id/foto', 
-    upload.single('foto'), 
+    upload.single('foto'), // ✨ Limpo, elegante e tipado sem erro!
     colaboradorController.updateFoto.bind(colaboradorController)
 );
 

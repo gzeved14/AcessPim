@@ -1,10 +1,10 @@
 import { Repository, DataSource } from "typeorm";
-import { RegistroAcesso } from "../entities/RegistroAcesso.js";
-import { Area } from "../entities/Area.js";
-import { Tipo } from "../types/Tipo.js";
+import { RegistroAcesso } from "../entities/RegistroAcesso";
+import { Area } from "../entities/Area";
+import { Tipo } from "../types/Tipo";
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc.js';
-import timezone from 'dayjs/plugin/timezone.js';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

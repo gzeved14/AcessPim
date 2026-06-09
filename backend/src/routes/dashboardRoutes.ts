@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { appDataSource } from '../config/appDataSource.js';
-import DashboardController from '../controllers/DashboardController.js';
-import { DashboardService } from '../services/DashboardService.js';
-import { ensureAuth } from '../middleware/authMiddleware.js'
+import { appDataSource } from '../config/appDataSource';
+import DashboardController from '../controllers/DashboardController';
+import { DashboardService } from '../services/DashboardService';
+import { ensureAuth } from '../middleware/authMiddleware'
 
 
 const dashboardRoutes = Router();

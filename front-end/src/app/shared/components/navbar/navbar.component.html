@@ -1,0 +1,22 @@
+<!-- Barra superior com identidade da aplicacao e logout rapido. -->
+<nav class="navbar">
+  <div class="left-actions">
+    <button
+      type="button"
+      class="menu-button"
+      aria-label="Abrir ou fechar barra lateral"
+      (click)="onToggleSidebar()"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  <!-- Exibe o nome do usuario autenticado de forma contextual. -->
+  <div class="brand">
+    <strong>AccessPIM</strong>
+    <span class="welcome">Olá, {{ userName || 'Usuário' }}</span>
+  </div>
+  </div>
+  <!-- Dispara o evento de logout para o componente pai. -->
+</nav>

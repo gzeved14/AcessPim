@@ -1,24 +1,17 @@
 import multer from 'multer';
 import path from 'path';
-import crypto from 'crypto';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// O caminho onde as fotos serão salvas
-const uploadFolder = path.resolve(__dirname, '..', '..', 'uploads', 'fotos');
+// 🎯 Substitua a linha 6 por isso (Sem usar import.meta):
+const uploadFolder = path.resolve(__dirname, '..', 'tmp');
 
 export const uploadConfig = {
-    directory: uploadFolder,
-    storage: multer.diskStorage({
-        destination: uploadFolder,
-        filename: (req, file, cb) => {
-            const fileHash = crypto.randomBytes(10).toString('hex');
-            const fileName = `${fileHash}-${file.originalname.replace(/\s/g, '_')}`;
-            return cb(null, fileName);
-        }
-    })
+  directory: uploadFolder,
+  storage: multer.diskStorage({
+    destination: uploadFolder,
+    filename(request, file, callback) {
+      const fileHash = Date.now();
+      const fileName = `${fileHash}-${file.originalname}`;
+      return callback(null, fileName);
+    },
+  }),
 };
-
-export const upload = multer(uploadConfig);

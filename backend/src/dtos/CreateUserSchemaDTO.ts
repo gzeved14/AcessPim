@@ -1,7 +1,7 @@
 
 // Importa o validador Zod e o enum de perfis de usuário
 import { z } from "zod";
-import { PerfilUsuario } from "../types/PerfilUsuario.js";
+import { PerfilUsuario } from "../types/PerfilUsuario";
 
 
 // Schema de validação para criação de usuário

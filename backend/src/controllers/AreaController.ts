@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { AreaService } from "../services/AreaService.js"
-import { AppError } from "../errors/AppError.js"
+import { AreaService } from "../services/AreaService"
+import { AppError } from "../errors/AppError"
 
 export default class AreaController {
 	constructor(private readonly areaService: AreaService) {}
@@ -31,6 +31,37 @@ export default class AreaController {
 		const id  = req.params.id as string;
 		const areaUpdate = await this.areaService.update(id, req.body);
 		return res.status(200).json(areaUpdate);
+	}
+
+	async obterEpisArea(req: Request, res: Response): Promise<Response> {
+	try {
+		const id = String(req.params.id);
+		const area = await this.areaService.findById(id);
+		
+		if (!area) {
+		return res.status(404).json({ message: "Área não encontrada." });
+		}
+
+		// Regra de negócio do Trio: Se a área for crítica/alta, exige equipamentos
+		// Mapeamos dinamicamente baseado no nível de risco salvo no Postgres
+		let episRequired: string[] = [];
+		const risco = String(area.nivel_risco).toUpperCase();
+
+		if (risco === 'ALTO' || risco === 'CRITICO') {
+		episRequired = ["capacete", "oculos"];
+		} else if (risco === 'MEDIO') {
+		episRequired = ["oculos"];
+		}
+
+		return res.status(200).json({
+		area_id: id,
+		area_nome: area.nome,
+		epis: episRequired // Chave que o seu NetworkService em Python consome!
+		});
+	} catch (error) {
+		console.error("Erro ao ler requisitos de EPI:", error);
+		return res.status(500).json({ message: "Erro ao ler requisitos de EPI." });
+	}
 	}
 
 	async delete( req: Request, res: Response) {

@@ -1,10 +1,10 @@
 import { Repository, DataSource } from "typeorm";
-import { Area } from "../entities/Area.js";
-import { AppError } from "../errors/AppError.js";
+import { Area } from "../entities/Area";
+import { AppError } from "../errors/AppError";
 
 // Importa o tipo Colaborador para uso nos DTOs
-import { Colaborador } from "../entities/Colaborador.js";
-import { Nivel_Risco } from "../types/Nivel_Risco.js";
+import { Colaborador } from "../entities/Colaborador";
+import { Nivel_Risco } from "../types/Nivel_Risco";
 
 // Define um DTO (Data Transfer Object) para a criação de uma Área.
 // Isso torna explícito o formato dos dados esperados do frontend/controlador.

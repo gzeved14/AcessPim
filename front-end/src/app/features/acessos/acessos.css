@@ -1,0 +1,113 @@
+/* Container principal da tela. */
+.page {
+  padding: 2rem;
+}
+
+/* Cabecalho com titulo e acao de novo registro. */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Bloco de filtros do historico. */
+.filters {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+}
+
+/* Estilo de labels e controles do formulario de filtro. */
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: #334155;
+  font-size: 0.92rem;
+}
+
+.filters input {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.4rem;
+}
+
+/* Grupo de botoes de acao (filtrar/limpar). */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Padrao visual de botoes da tela. */
+button {
+  border: 0;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  background: #0f172a;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Regra adicionada para forçar a cor verde do botão "Novo Registro",
+   caso o Tailwind CSS não esteja sendo aplicado corretamente. */
+.access-register-button {
+  background-color: #059669 !important; /* Cor para emerald-600 */
+  color: #ffffff !important;
+}
+/* Variacao secundaria para acoes menos prioritarias. */
+button.secondary {
+  background: #475569;
+}
+
+/* Mensagens de feedback para usuario. */
+.feedback {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.feedback.error {
+  color: #b91c1c;
+}
+
+.list-table tbody tr.row-denied {
+  background: #fef2f2;
+}
+
+.list-table tbody tr.row-denied td {
+  color: #991b1b;
+  font-weight: 600;
+}
+
+/* Tabela de exibicao do historico de acessos. */
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #ffffff;
+}
+
+.list-table th,
+.list-table td {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .page {
+    padding: 1.25rem;
+  }
+
+  .header-row,
+  .actions {
+    flex-wrap: wrap;
+  }
+}

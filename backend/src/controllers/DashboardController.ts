@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { DashboardService } from "../services/DashboardService.js"
+import { DashboardService } from "../services/DashboardService"
 
 /**
  * @class DashboardController

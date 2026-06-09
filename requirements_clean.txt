@@ -17,5 +17,5 @@ Pygments==2.20.0
 pytest==9.0.3
 requests==2.34.2
 ruff==0.15.14
-setuptools==82.0.1
+setuptools==80.9.0
 urllib3==2.7.0

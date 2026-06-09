@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { appDataSource } from '../config/appDataSource.js';
-import { validateBody } from '../middleware/validateBody.js';
-import AcessoController from '../controllers/AcessoController.js';
-import { AcessoService } from '../services/AcessoService.js';
-import { createAccessRecordSchema, updateAccessRecordSchema } from '../dtos/CreateRegistroSchemaDTO.js';
-import { ensureAuth } from '../middleware/authMiddleware.js'
+import { appDataSource } from '../config/appDataSource';
+import { validateBody } from '../middleware/validateBody';
+import AcessoController from '../controllers/AcessoController';
+import { AcessoService } from '../services/AcessoService';
+import { createAccessRecordSchema, updateAccessRecordSchema } from '../dtos/CreateRegistroSchemaDTO';
+import { ensureAuth } from '../middleware/authMiddleware'
 const accessRoutes = Router();
 
 const accessService = new AcessoService(appDataSource);

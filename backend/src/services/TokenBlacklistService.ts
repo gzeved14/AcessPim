@@ -1,5 +1,5 @@
 import { LessThan, DataSource, Repository } from "typeorm";
-import { TokenBlacklist } from "../entities/TokenBlacklist.js";
+import { TokenBlacklist } from "../entities/TokenBlacklist";
 
 /**
  * @class TokenBlacklistService

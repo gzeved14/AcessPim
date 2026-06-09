@@ -1,23 +1,28 @@
 import { Router } from 'express';
-import userRoutes from './usuarioRoutes.js';
-import authRoutes from './authRoutes.js';
-import collaboratorRoutes from './colaboradorRoutes.js';
-import areaRoutes from './areaRoutes.js';
-import accessRoutes from './acessoRoutes.js';
-import dashboardRoutes from './dashboardRoutes.js';
-import { ensureAuth } from '../middleware/authMiddleware.js';
-import { appDataSource } from '../config/appDataSource.js';
+import userRoutes from './usuarioRoutes';
+import authRoutes from './authRoutes';
+import collaboratorRoutes from './colaboradorRoutes';
+import areaRoutes from './areaRoutes';
+import accessRoutes from './acessoRoutes';
+import dashboardRoutes from './dashboardRoutes';
+import { ensureAuth } from '../middleware/authMiddleware';
 
 const routes = Router();
 
-routes.use("/auth", authRoutes);
+// 🔓 1. ROTAS PÚBLICAS (Não exigem token JWT)
+routes.use("/auth", authRoutes); // /api/auth/login
 
+// 🎯 MOVA A SUA ROTA DE REGISTRO PARA CÁ (Antes do filtro de segurança):
+// Se ela estiver configurada via accessRoutes:
+routes.use("/registro", accessRoutes); 
+
+// 🛡️ 2. FILTRO DE SEGURANÇA GLOBAL
 routes.use(ensureAuth);
 
-routes.use("/usuario", ensureAuth, userRoutes);
+// 🔒 3. ROTAS PRIVADAS (Exigem token JWT)
+routes.use("/usuario", userRoutes);
 routes.use("/colaborador", collaboratorRoutes);
 routes.use("/area", areaRoutes);
-routes.use("/registro", accessRoutes);
-routes.use("/dashboard", ensureAuth, dashboardRoutes);
+routes.use("/dashboard", dashboardRoutes);
 
 export default routes;

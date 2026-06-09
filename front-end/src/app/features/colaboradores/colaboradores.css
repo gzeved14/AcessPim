@@ -1,0 +1,55 @@
+.page {
+  padding: 2rem;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Estilos de botão removidos - usar classes Tailwind no HTML */
+
+button.secondary {
+  background: #475569;
+}
+
+/* Regra adicionada para forçar a cor verde do botão,
+   caso o Tailwind CSS não esteja sendo aplicado corretamente. */
+.custom-green-button {
+  background-color: #059669 !important; /* Cor para emerald-600 */
+  color: #ffffff !important;
+}
+.feedback {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.feedback.error {
+  color: #b91c1c;
+}
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #ffffff;
+}
+
+.list-table th,
+.list-table td {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .page {
+    padding: 1.25rem;
+  }
+
+  .header-row {
+    flex-wrap: wrap;
+  }
+}

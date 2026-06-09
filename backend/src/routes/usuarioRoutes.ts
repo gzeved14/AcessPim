@@ -1,13 +1,13 @@
 import { Router } from 'express'; //permite criar módulos de rotas separados do app principal
-import { appDataSource } from '../config/appDataSource.js'; //injeta no service para que o service possa acessar repo/entidades
+import { appDataSource } from '../config/appDataSource'; //injeta no service para que o service possa acessar repo/entidades
 // Controlador responsável por mediar as requisições para métodos de usuários.
-import UsuarioController from '../controllers/UsuarioController.js';
+import UsuarioController from '../controllers/UsuarioController';
 // Middleware utilizado para verificar se os dados informados num POST/PUT coincidem com a base de segurança pré estabelecida DTO.
-import { validateBody } from '../middleware/validateBody.js';
-import { CreateUserSchemaDTO, updateUserSchema } from '../dtos/CreateUserSchemaDTO.js';
+import { validateBody } from '../middleware/validateBody';
+import { CreateUserSchemaDTO, updateUserSchema } from '../dtos/CreateUserSchemaDTO';
 // O serviço que conterá os métodos atrelados da base que retornam e escrevem banco na base.
-import { UsuarioService } from '../services/UsuarioService.js';
-import { ensureAuth } from '../middleware/authMiddleware.js'
+import { UsuarioService } from '../services/UsuarioService';
+import { ensureAuth } from '../middleware/authMiddleware'
 
 // Transforma "userRoutes" num agrupador configurável nativo de rotas express.
 const userRoutes = Router();

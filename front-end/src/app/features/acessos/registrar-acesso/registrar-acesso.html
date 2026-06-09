@@ -1,0 +1,139 @@
+<div class="p-6 max-w-3xl mx-auto text-slate-200">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-1">Registrar Acesso</h2>
+      <p class="text-slate-400 text-base">Lance uma nova entrada ou saída no sistema.</p>
+    </div>
+    <div>
+      <button type="button" class="bg-zinc-800 border border-zinc-700 text-slate-300 px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-zinc-700 flex items-center gap-2" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i> Voltar
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-zinc-900 rounded-xl p-6 shadow-lg border border-zinc-800">
+    @if (errorMessage()) {
+      <div class="text-red-400 mb-6 text-sm bg-red-500/10 border border-red-500/20 p-4 rounded-lg flex items-center gap-2"><i class="fa fa-exclamation-circle text-lg"></i> {{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="text-emerald-400 mb-6 text-sm bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-lg flex items-center gap-2"><i class="fa fa-check-circle text-lg"></i> {{ successMessage() }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #form="ngForm" class="grid grid-cols-1 gap-5">
+      
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Colaborador</label>
+        <select name="colaboradorId" [(ngModel)]="colaboradorId" required (change)="checkAuthorization()" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500 disabled:opacity-50">
+          <option value="" disabled selected>Selecione quem está acessando...</option>
+          @for (colab of colaboradores(); track colab.id) {
+            <option [value]="colab.id">{{ colab.nome }} ({{ colab.matricula }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-semibold text-slate-400">Área de Destino</label>
+        <select name="areaId" [(ngModel)]="areaId" required (change)="onAreaChange()" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500 disabled:opacity-50">
+          <option value="" disabled selected>Selecione a área...</option>
+          @for (area of areas(); track area.id) {
+            <option [value]="area.id">{{ area.nome }} - Nível: {{ area.nivel_risco }}</option>
+          }
+        </select>
+        @if (areaLotada()) {
+          <div class="text-amber-400 text-xs mt-1 flex items-center gap-1">
+            <i class="fa fa-exclamation-triangle"></i> Esta área está com capacidade máxima atingida.
+          </div>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Tipo de Movimentação</label>
+          <select name="tipo" [(ngModel)]="tipo" required (change)="onTipoChange()" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500">
+            <option value="ENTRADA">Entrada</option>
+            <option value="SAIDA">Saída</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Situação do Acesso</label>
+          <select name="resultado" [(ngModel)]="resultado" required class="bg-zinc-800 border border-zinc-700 text-white px-3 py-3 rounded-md focus:outline-none focus:border-teal-500">
+            <option value="autorizado">Autorizado</option>
+            <option value="negado">Barrado / Negado</option>
+          </select>
+        </div>
+      </div>
+
+      @if (showObservacao) {
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Motivo (Obrigatório para acesso negado)</label>
+          <textarea name="observacao" [(ngModel)]="observacao" rows="3" placeholder="Qual o motivo da recusa de acesso?" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500"></textarea>
+        </div>
+      }
+
+      <!-- PREVIEW DE AUTORIZAÇÃO -->
+      @if (previewLoading()) {
+        <div class="bg-zinc-800 border border-zinc-700 p-4 rounded-lg text-center text-slate-300 flex items-center justify-center gap-2">
+          <i class="fa fa-spinner fa-spin"></i>
+          <span>Verificando autorização...</span>
+        </div>
+      }
+
+      @if (showPreview() && previewResult()) {
+        <div class="p-4 rounded-lg border" [ngClass]="previewResult().autorizado 
+          ? 'bg-emerald-500/10 border-emerald-500/30' 
+          : 'bg-red-500/10 border-red-500/30'">
+          
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+              @if (previewResult().autorizado) {
+                <i class="fa fa-check-circle text-xl text-emerald-400"></i>
+              } @else {
+                <i class="fa fa-times-circle text-xl text-red-400"></i>
+              }
+            </div>
+            
+            <div class="flex-1">
+              <h3 class="font-semibold mb-2" [ngClass]="previewResult().autorizado ? 'text-emerald-400' : 'text-red-400'">
+                {{ previewResult().autorizado ? 'Autorizado' : 'Não Autorizado' }}
+              </h3>
+              
+              <p class="text-sm text-slate-300 mb-3">
+                {{ previewResult().motivo }}
+              </p>
+              
+              <div class="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                <div>
+                  <span class="block font-semibold text-slate-300">Colaborador:</span>
+                  {{ previewResult().colaborador_nome }}
+                </div>
+                <div>
+                  <span class="block font-semibold text-slate-300">Cargo:</span>
+                  {{ previewResult().colaborador_cargo }}
+                </div>
+                <div>
+                  <span class="block font-semibold text-slate-300">Área:</span>
+                  {{ previewResult().area_nome }}
+                </div>
+                @if (previewResult().detalhes?.capacidade) {
+                  <div>
+                    <span class="block font-semibold text-slate-300">Capacidade:</span>
+                    {{ previewResult().detalhes.ocupacao_futura || previewResult().detalhes.ocupacao_atual }}/{{ previewResult().detalhes.capacidade }}
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="flex justify-end gap-3 mt-4 pt-5 border-t border-zinc-800">
+        <button type="submit" class="bg-teal-500 text-gray-900 border-none px-6 py-2.5 rounded-md cursor-pointer font-semibold transition-colors hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 items-center" [disabled]="form.invalid || submitting()">
+          @if (submitting()) { <i class="fa fa-spinner fa-spin"></i> }
+          @else { <i class="fa fa-save"></i> }
+          {{ submitting() ? 'Registrando...' : 'Gravar Acesso' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

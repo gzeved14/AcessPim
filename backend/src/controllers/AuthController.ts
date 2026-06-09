@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { AuthService } from "../services/AuthService.js";
+import type { AuthService } from "../services/AuthService";
 
 
 const sanitizeUser = (user: any) => {

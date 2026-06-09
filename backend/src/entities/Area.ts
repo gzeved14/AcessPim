@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Nivel_Risco } from "../types/Nivel_Risco.js";
+import { Nivel_Risco } from "../types/Nivel_Risco";
 import { JoinColumn } from "typeorm";
-import type { Colaborador } from "./Colaborador.js";
-import type { RegistroAcesso } from "./RegistroAcesso.js";
+import type { Colaborador } from "./Colaborador";
+import type { RegistroAcesso } from "./RegistroAcesso";
 
 @Entity("area")
 export class Area{

@@ -1,6 +1,6 @@
-import { Usuario } from "../entities/Usuario.js"
+import { Usuario } from "../entities/Usuario"
 import { Repository, DataSource } from "typeorm";
-import { AppError } from "../errors/AppError.js"
+import { AppError } from "../errors/AppError"
 import { hash } from "bcryptjs";
 
 /**

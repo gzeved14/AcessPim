@@ -1,0 +1,56 @@
+<main class="relative min-h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-slate-50 to-emerald-50 p-4 md:p-8">
+  <div class="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-rose-300/30 blur-3xl"></div>
+  <div class="pointer-events-none absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-emerald-300/30 blur-3xl"></div>
+
+  <section class="relative mx-auto mt-12 w-full max-w-md rounded-3xl border border-white/70 bg-white/85 p-8 shadow-[0_20px_50px_rgba(15,23,42,0.12)] backdrop-blur md:mt-24">
+    <div class="mb-6 space-y-2">
+      <p class="inline-block rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold tracking-wide text-rose-700">
+        ACCESSPIM
+      </p>
+      <h1 class="text-2xl font-bold text-slate-900">Acesso ao sistema</h1>
+      <p class="text-sm text-slate-600">Entre com seu email e senha para continuar.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+      <div class="space-y-1.5">
+        <label for="email" class="text-sm font-medium text-slate-700">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="voce@empresa.com"
+          class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <small class="text-xs font-medium text-rose-700">Informe um email valido.</small>
+        }
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="senha" class="text-sm font-medium text-slate-700">Senha</label>
+        <input
+          id="senha"
+          type="password"
+          formControlName="password"
+          placeholder="Sua senha"
+          class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small class="text-xs font-medium text-rose-700">A senha deve ter no minimo 6 caracteres.</small>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{{ errorMessage() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ loading() ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+  </section>
+</main>

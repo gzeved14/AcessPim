@@ -20,6 +20,7 @@ venv/
 # Build / output
 dist/
 build/
+*.tsbuildinfo
 
 # Tests
 coverage/
@@ -43,3 +44,6 @@ yarn-error.log*
 
 # Local backups
 requirements.orig.txt
+
+# Docker
+docker-compose.override.yml # Ignorar overrides locais do Docker Compose
