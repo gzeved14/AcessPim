@@ -15,8 +15,8 @@ export class Area{
     @Column({ type: 'text', nullable: true})
     descricao!: string;
 
-    @Column({ type: 'text', enum: Nivel_Risco, nullable: false })
-    nivel_risco!: Nivel_Risco;
+    @Column({ type: 'enum', enum: Nivel_Risco, nullable: true , default: null})
+    nivel_risco!: Nivel_Risco | null;
 
     @Column({ type: 'integer', nullable: false })
     capacidade!: number;

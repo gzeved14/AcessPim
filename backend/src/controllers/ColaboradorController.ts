@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { ColaboradorService } from "../services/ColaboradorService"
 import { AppError } from "../errors/AppError";
+import { SolicitarCadastroRostoSchema } from "../dtos/CreateColaboradorDTO";
+import { AcessoService } from "../services/AcessoService";
 
 /**
  * @class ColaboradorController
@@ -67,6 +69,28 @@ export default class ColaboradorController {
 		const colaborador = await this.colaboradorService.updateFoto(id, fileName);
 
 		return res.json(colaborador);
+	}
+
+	async iniciarCadastroFacial(request: Request, response: Response): Promise<Response> {
+		try {
+			// Valida se o ID enviado pelo front é um UUID correto
+			const { colaborador_id } = SolicitarCadastroRostoSchema.parse(request.body);
+			// Chama o serviço que faz a checagem no banco e aciona o Python
+			const resultado = await this.colaboradorService.solicitarTreinamentoBorda(colaborador_id);
+
+			return response.status(200).json({
+				status: "SUCCESS",
+				message: resultado
+			});
+		} catch (error: any) {
+			if (error.name === "ZodError") {
+				return response.status(400).json({ status: "ERROR", errors: error.errors });
+			}
+			if (error instanceof AppError) {
+				return response.status(error.statusCode).json({ status: "ERROR", message: error.message });
+			}
+			return response.status(500).json({ status: "ERROR", message: "Erro interno ao acionar cadastro." });
+		}
 	}
 
 	/**

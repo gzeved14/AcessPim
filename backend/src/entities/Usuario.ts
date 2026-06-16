@@ -24,7 +24,7 @@ export class Usuario {
     @Column({ type: 'text', nullable: false })
     setor!: string;
 
-    @Column({ type: 'text', enum: PerfilUsuario, nullable: false })
+    @Column({ type: 'enum', enum: PerfilUsuario, nullable: false })
     cargo!: PerfilUsuario;
 
     @Column({ type: 'timestamptz', default: () => 'NOW()' })

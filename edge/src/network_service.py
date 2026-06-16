@@ -257,11 +257,16 @@ class NetworkService:
             Dict com dados do colaborador ou None se inacessível.
         """
         try:
+            
+            url_consulta = f"{self._base_url}/colaborador/{colaborador_id}"
+            
             resp = requests.get(
-                f"{self._base_url}/api/colaboradores/{colaborador_id}",
+                url_consulta,
                 headers=self._headers,
                 timeout=TIMEOUT_REQUEST,
             )
+            print(f"👉 [STATUS DO NODE]: {resp.status_code} | Corpo: {resp.text}")
+            
             if resp.status_code == 200:
                 return resp.json()
         except requests.exceptions.RequestException as e:
@@ -353,3 +358,5 @@ class NetworkService:
                 )
                 # Se o backend caiu, para o ciclo atual para não gerar flood de erros
                 break
+    
+    

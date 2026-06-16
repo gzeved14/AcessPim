@@ -1,7 +1,7 @@
 import { Repository, DataSource } from "typeorm";
 import { Colaborador } from "../entities/Colaborador";
 import { AppError } from "../errors/AppError";
-
+import { Axios } from "axios";
 /**
  * Serviço responsável pelas regras de negócio do domínio Colaborador.
  * Abstrai operações para manter controllers mais limpos.
@@ -119,5 +119,33 @@ export class ColaboradorService {
 
         colaborador.foto_url = fotoUrl;
         return this.repo.save(colaborador);
+    }
+
+    async solicitarTreinamentoBorda(colaboradorId: string): Promise<string> {
+        // 1. REGRA DE NEGÓCIO: Impede cadastrar funcionários que não existem no PostgreSQL
+        const colaborador = await this.repo.manager.findOne(Colaborador, {
+            where: { id: colaboradorId }
+        });
+
+        if (!colaborador) {
+            throw new AppError("Operação Negada: Não é possível cadastrar biometria para um colaborador inexistente.", 404);
+        }
+
+        try {
+            console.log(`📡 [INTEGRAÇÃO] Enviando comando de abertura de câmera para a catraca... Colaborador: ${colaborador.nome}`);
+            
+            // URL da catraca física (IP local da máquina Advantech/ADLINK onde o Python roda)
+            const urlCatracaPython = "http://localhost:5000/api/borda/cadastrar"; 
+            
+            // Dispara a chamada HTTP para o Python iniciar a captura das 50 fotos
+            const respostaBorda = await Axios.post(urlCatracaPython, {
+                colaborador_id: colaborador.id
+            }, { timeout: 60000 }); // Timeout longo (1 minuto) para dar tempo do usuário se posicionar
+
+            return `Biometria de ${colaborador.nome} processada com sucesso na borda!`;
+        } catch (error: any) {
+            console.error("❌ [ERRO BORDA]", error.message);
+            throw new AppError("A catraca física de borda está offline ou não respondeu ao comando.", 503);
+        }
     }
 }

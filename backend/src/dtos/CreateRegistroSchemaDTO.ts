@@ -12,6 +12,12 @@ export const createRegistroSchemaDTO = z.object({
     observacao:     z.string().optional().nullable(),
 }).passthrough();
 
+export const createSyncCacheSchemaDTO = z.object({
+    matricula: z.string().min(1),
+    area: z.string().min(1),
+})
+
 export const updateAccessRecordSchema = createRegistroSchemaDTO.partial();
 export const createAccessRecordSchema = createRegistroSchemaDTO;
 export const updateAccessRecordSchemaDTO = updateAccessRecordSchema;
+export type CreateSyncCacheDTO = z.infer<typeof createSyncCacheSchemaDTO>;

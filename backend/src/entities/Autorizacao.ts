@@ -3,7 +3,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDa
 // Importa as classes referenciadas de colaborador e área para compor chave estrangeira.
 import { Colaborador } from "./Colaborador";
 import { Area } from "./Area";
-import { Cargo } from "../types/Cargo";
 
 // Define que essa classe representa a entidade (tabela) chamada "autorizacao".
 @Entity("autorizacao")
@@ -23,8 +22,8 @@ export class Autorizacao {
     area!: Area;
 
     // Define qual cargo DE COLABORADOR tem permissão para transitar nesta área (TECNICO_MANUTENCAO, AUXILIAR_PRODUCAO, etc).
-    @Column({ type: "enum", enum: Cargo, nullable: true })
-    cargo?: Cargo;
+    @Column({ type: "text", nullable: true })
+    cargo?: string;
 
     // Coluna para armazenar o prazo em que essa autorização deve expirar, caso seja algo temporário.
     @Column({ type: 'timestamptz', nullable: true }) 
