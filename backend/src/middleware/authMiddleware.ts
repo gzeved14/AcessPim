@@ -23,6 +23,7 @@ const getAccessSecret = () => {
 const blacklistService = new TokenBlacklistService(appDataSource);
 
 // Middleware que captura e avalia as credenciais HTTP antes das rotas entrarem em seus controllers para checar autorização de usuário.
+// Middleware que captura e avalia as credenciais HTTP antes das rotas entrarem em seus controllers para checar autorização de usuário.
 export const ensureAuth: RequestHandler = async (req, res, next) => {
     console.log("[ensureAuth] Requisição recebida:", req.method, req.originalUrl, req.headers.authorization);
     const authHeader = req.headers.authorization;
@@ -36,6 +37,17 @@ export const ensureAuth: RequestHandler = async (req, res, next) => {
     if (!token) {
         console.warn("⚠️ Token ausente após slice");
         return next(new AppError("Token ausente", 401));
+    }
+
+    // 🎯 BYPASS DE SEGURANÇA PARA A CATRACA / BORDA (ADICIONE ESTE BLOCO AQUI):
+    // Se o token corresponder à assinatura estática de hardware da borda, libera o fluxo imediatamente!
+    if (token === "1010-ACCESSPIM") {
+        console.log("🤖 [M2M AUTH] Borda autenticada com sucesso via token estático de hardware.");
+        
+        // Injeta um payload fictício no request caso seus controllers dependam do objeto 'req.auth'
+        (req as any).auth = { sub: "borda-device", role: "HARDWARE_DEVICE" }; 
+        
+        return next(); // Pula o muro de validação JWT e vai direto para a rota!
     }
 
     try {

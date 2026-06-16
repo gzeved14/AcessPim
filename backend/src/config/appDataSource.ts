@@ -7,6 +7,7 @@ import { RegistroAcesso } from "../entities/RegistroAcesso";
 import { TokenBlacklist } from "../entities/TokenBlacklist";
 import { Usuario } from "../entities/Usuario";
 import { env } from './env';
+import { AccessLogCache } from "../entities/AccessLogCache";
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ export const appDataSource = new DataSource({
     username: env.DB_USER,
     password: env.DB_PASSWORD,
     database: env.DB_NAME,
-    synchronize: false,
+    synchronize: true,
     logging: false,
     // Lista explícita para evitar falhas de metadata com glob patterns no runtime ESM.
     entities: [
@@ -26,6 +27,7 @@ export const appDataSource = new DataSource({
         Colaborador,
         RegistroAcesso,
         TokenBlacklist,
-        Usuario
+        Usuario,
+        AccessLogCache
     ],
 });

@@ -111,7 +111,7 @@ appDataSource.initialize()
     console.log("💾 [BANCO] Conexão com o PostgreSQL via TypeORM estabelecida!");
     console.log("📊 [METADATA] Entidades sincronizadas e prontas na memória.");
 
-    app.listen(appPort, () => {
+    app.listen(3000, "0.0.0.0", () => {
       console.log(`🚀 Servidor rodando na porta ${appPort}`);
       console.log(`👉 API ativa para receber logs da borda em: http://localhost:${appPort}/api/registro`);
     });

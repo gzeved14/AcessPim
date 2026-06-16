@@ -13,3 +13,8 @@ export const createColaboradorSchemaDTO = createColaboradorSchema;
 export const updateColaboradorSchema = createColaboradorSchema.partial().extend({
     ativo: z.boolean().optional()
 });
+
+export const SolicitarCadastroRostoSchema = z.object({
+    colaborador_id: z.string().uuid("ID do colaborador inválido (Deve ser UUID)")
+});
+export type SolicitarCadastroRostoDTO = z.infer<typeof SolicitarCadastroRostoSchema>;

@@ -11,9 +11,9 @@ const accessService = new AcessoService(appDataSource);
 const accessController = new AcessoController(accessService);
 
 accessRoutes.use(ensureAuth);
-
 accessRoutes.get("/colaborador/:colaboradorId/historico", accessController.findByColaborador.bind(accessController));
 accessRoutes.get("/", accessController.findAll.bind(accessController));
+accessRoutes.post("/api/registro", (req, res) => accessController.handle(req, res));
 accessRoutes.post("/preview", accessController.checkAuthorization.bind(accessController));
 accessRoutes.post("/", validateBody(createAccessRecordSchema), accessController.create.bind(accessController));
 accessRoutes.put("/:id", validateBody(updateAccessRecordSchema), accessController.update.bind(accessController));
