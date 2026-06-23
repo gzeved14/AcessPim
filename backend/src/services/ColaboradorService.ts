@@ -1,7 +1,7 @@
 import { Repository, DataSource } from "typeorm";
 import { Colaborador } from "../entities/Colaborador";
 import { AppError } from "../errors/AppError";
-import { Axios } from "axios";
+import  axios from "axios";
 /**
  * Serviço responsável pelas regras de negócio do domínio Colaborador.
  * Abstrai operações para manter controllers mais limpos.
@@ -135,17 +135,27 @@ export class ColaboradorService {
             console.log(`📡 [INTEGRAÇÃO] Enviando comando de abertura de câmera para a catraca... Colaborador: ${colaborador.nome}`);
             
             // URL da catraca física (IP local da máquina Advantech/ADLINK onde o Python roda)
-            const urlCatracaPython = "http://localhost:5000/api/borda/cadastrar"; 
-            
-            // Dispara a chamada HTTP para o Python iniciar a captura das 50 fotos
-            const respostaBorda = await Axios.post(urlCatracaPython, {
+            const urlCatracaPython = "http://172.20.10.2:5000/api/borda/cadastrar";            // Dispara a chamada HTTP para o Python iniciar a captura das 50 fotos
+            const respostaBorda = await axios.post(urlCatracaPython, {
                 colaborador_id: colaborador.id
             }, { timeout: 60000 }); // Timeout longo (1 minuto) para dar tempo do usuário se posicionar
 
             return `Biometria de ${colaborador.nome} processada com sucesso na borda!`;
-        } catch (error: any) {
-            console.error("❌ [ERRO BORDA]", error.message);
-            throw new AppError("A catraca física de borda está offline ou não respondeu ao comando.", 503);
+       } catch (error: any) {
+        console.error("[ERRO AXIOS NA BORDA]:", error.message);
+        throw error;
+       }
+    }
+
+    async desativarStatusBiometrico (id: string): Promise<Colaborador> {
+        const colaborador = await this.repo.findOne({
+            where: { id }
+        });
+        
+        if (!colaborador) {
+            throw new Error('Colaborador não encontrado no banco de dados central.')
         }
+        colaborador.biometria_ativa = false;
+        return await this.repo.save(colaborador);
     }
 }

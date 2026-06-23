@@ -3,6 +3,7 @@ import { ColaboradorService } from "../services/ColaboradorService"
 import { AppError } from "../errors/AppError";
 import { SolicitarCadastroRostoSchema } from "../dtos/CreateColaboradorDTO";
 import { AcessoService } from "../services/AcessoService";
+import axios from "axios";
 
 /**
  * @class ColaboradorController
@@ -92,7 +93,65 @@ export default class ColaboradorController {
 			return response.status(500).json({ status: "ERROR", message: "Erro interno ao acionar cadastro." });
 		}
 	}
+	
+	/**
+     * @method iniciarReconhecimentoManual
+     * @description Gatilho para iniciar reconhecimento facial manual (RF28).
+     */
+    async iniciarReconhecimentoManual(req: Request, res: Response): Promise<Response> {
+        const { id } = req.params;
 
+        try {
+            // Unificado com o IP real capturado no ipconfig para pular o isolamento do Docker
+            const urlBorda = process.env.URL_BORDA || 'http://172.20.10.2:5000'; 
+
+            await axios.post(`${urlBorda}/api/borda/reconhecer`, { colaborador_id: id },
+                {
+                    headers: { 'Authorization': 'Bearer 1010-ACCESSPIM' }
+                });
+
+            return res.status(200).json({
+                status: "SUCCESS",
+                message: 'Comando de calibração enviado para a catraca de borda com sucesso.'
+            });
+        } catch (error: any) {
+            console.error("[ERRO RECONHECER]:", error.message);
+            return res.status(502).json({
+                status: 'ERROR',
+                message: 'Falha na comunicação com o dispositivo de borda (Catraca Offline).',
+                details: error.message
+            });
+        }
+    }
+
+	/**
+	 * @method removerBiometriaFacial
+	 * @description Gatilho para remover a biometria facial de um colaborador (RF29).
+	 */
+	async removerBiometriaFacial(req: Request, res: Response): Promise<Response> {
+		const { id } = req.params;
+
+		try {
+			const urlBorda = process.env.URL_BORDA || 'http://host.docker.internal:5000';
+			await axios.post(`${urlBorda}/api/borda/excluir`, {
+				colaborador_id: id
+			}, {
+				headers: { 'Authorization': 'Bearer 1010-ACCESSPIM'}
+			});
+
+			await this.colaboradorService.desativarStatusBiometrico(String(id));
+			return res.status(200).json({
+				status: 'SUCCESS',
+				message: 'Biometria facial removida com sucesso do colaborador e da borda.'
+			});
+			}catch (error: any){
+			return res.status(502).json({
+				status: 'ERROR',
+				message: 'Falha na comunicação com o dispositivo de borda para remoção da biometria facial.',
+				details: error.message
+			})
+		}
+	}
 	/**
 	 * @method softDelete
 	 * @description Desativa um colaborador (soft delete) (RF26).
