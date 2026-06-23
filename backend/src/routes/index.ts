@@ -11,35 +11,24 @@ import { syncRoutes } from './syncRoutes';
 const routes = Router();
 
 // ===========================================================================
-// 🔓 1. ROTAS PÚBLICAS (Não exigem token JWT de usuário)
+// 🔓 1. TOTALMENTE PÚBLICO (Zero middlewares, herda o caminho livre)
 // ===========================================================================
-routes.use("/auth", authRoutes); // /api/auth/login
-routes.use("/sync", syncRoutes);
-
-// 🎯 SOLUÇÃO DEFINITIVA PARA A BUSCA PÚBLICA DA BORDA:
-// Em vez de criar uma rota GET isolada que quebra o escopo do req.params,
-// nós montamos o sub-roteador do colaborador ANTES do filtro de segurança global.
-// O middleware 'ensureAuth' configurado dentro do 'authMiddleware' já vai interceptar 
-// o token de hardware '1010-ACCESSPIM' e dar o bypass com sucesso!
-routes.use("/colaborador", collaboradorRoutes);
-
-// Se ela estiver configurada via accessRoutes:
-routes.use("/registro", accessRoutes); 
-
+routes.use("/auth", authRoutes); // 🟢 Resolve: /api/auth/login sem NENHUMA trava
 
 // ===========================================================================
-// 🛡️ 2. FILTRO DE SEGURANÇA GLOBAL
+// 🛡️ 2. ROTAS COM PROTEÇÃO BIOMÉTRICA / M2M (Bypass com Token de Hardware)
 // ===========================================================================
-// Como a rota "/colaborador" agora está acima, ela herda apenas o bypass do token M2M.
-// As demais rotas administrativas abaixo continuam exigindo o Token JWT convencional do painel.
-routes.use(ensureAuth);
+// Injetamos o middleware explicitamente aqui para validar o token '1010-ACCESSPIM'
+routes.use("/colaborador", ensureAuth, collaboradorRoutes);
+routes.use("/registro", ensureAuth, accessRoutes); 
+routes.use("/sync", ensureAuth, syncRoutes);
 
-
 // ===========================================================================
-// 🔒 3. ROTAS PRIVADAS (Exigem token JWT do painel administrativo)
+// 🔒 3. ROTAS PRIVADAS ADMINISTRATIVAS (Exigem Token JWT do Usuário Logado)
 // ===========================================================================
-routes.use("/usuario", userRoutes);
-routes.use("/area", areaRoutes);
-routes.use("/dashboard", dashboardRoutes);
+// Passamos o ensureAuth apenas para os módulos que necessitam de login do painel Angular
+routes.use("/usuario", ensureAuth, userRoutes);
+routes.use("/area", ensureAuth, areaRoutes);
+routes.use("/dashboard", ensureAuth, dashboardRoutes);
 
 export default routes;

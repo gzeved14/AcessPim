@@ -12,6 +12,10 @@ export interface Colaborador {
     setor: string;
     // Indica se o colaborador pode ser selecionado em novas operacoes.
     ativo: boolean;
+    // Indica se o colaborador possui biometria facial cadastrada.
+    biometria_ativa: boolean;
     // URL opcional da foto de perfil.
     fotoUrl?: string;
+    // Data de criacao do registro, usada para ordenacao e controle de atualizacoes.
+    criadoEm: string;
 }

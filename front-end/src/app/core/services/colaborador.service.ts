@@ -39,6 +39,29 @@ export class ColaboradorService {
     return this.http.put<Colaborador>(`${this.API}/${id}`, colaborador);
   }
 
+  /**
+   * Dispara o inicio do Cadastro/Recadastro Facial na catraca da borda.
+   * Liberado para OPERADOR, GESTOR e ADMIN.
+   */
+  iniciarCadastroFacial(colaboradorId: string): Observable<any> {
+    return this.http.post(`${this.API}/cadastrar-rosto`, { colaborador_id: colaboradorId });
+  }
+  
+  /**
+   * Dispara uma verificação manual de reconhecimento facial na catraca da borda.
+   */
+  iniciarReconhecimentoManual(colaboradorId: string): Observable<any> {
+    return this.http.post(`${this.API}/${colaboradorId}/reconhecer`, {});
+  }
+
+  /**
+   * Expuga definitivamente os dados biométricos da borda (LGPD) 
+   * Restrito a ADMIN e GESTOR.
+   */
+  excluirBiometriaFacial(colaboradorId: string): Observable<any>{
+    return this.http.delete(`${this.API}/${colaboradorId}/facial`);
+  }
+  
   // US08: Alternar status ativo/inativo (sem deletar histórico)
   softDelete(id: string): Observable<void> {
     // Altera apenas o status sem remover o historico.

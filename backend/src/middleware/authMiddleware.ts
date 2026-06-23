@@ -25,7 +25,22 @@ const blacklistService = new TokenBlacklistService(appDataSource);
 // Middleware que captura e avalia as credenciais HTTP antes das rotas entrarem em seus controllers para checar autorização de usuário.
 // Middleware que captura e avalia as credenciais HTTP antes das rotas entrarem em seus controllers para checar autorização de usuário.
 export const ensureAuth: RequestHandler = async (req, res, next) => {
+    const urlOriginal = req.originalUrl || '';
+    const urlInvalida = req.url || '';
+    const caminhoPuro = req.path || '';
+    
     console.log("[ensureAuth] Requisição recebida:", req.method, req.originalUrl, req.headers.authorization);
+    
+    if (
+        urlOriginal.includes('/auth/login') || 
+        urlInvalida.includes('/auth/login') || 
+        caminhoPuro.includes('/login') ||
+        urlOriginal.includes('/registro')
+    ) {
+        console.log("🔓 [BYPASS] Rota pública liberada pelo middleware de segurança.");
+        return next();
+    }
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -60,6 +75,8 @@ export const ensureAuth: RequestHandler = async (req, res, next) => {
         const payload = jwt.verify(token, getAccessSecret()) as JwtPayload;
         console.log("[ensureAuth] Payload JWT decodificado:", payload);
         (req as any).auth = payload;
+        (req as any).user = payload;
+
         return next();
     } catch (error) {
         console.error("⚠️ Erro ao validar token:", error);

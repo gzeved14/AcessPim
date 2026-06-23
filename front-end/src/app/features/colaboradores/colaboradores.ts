@@ -223,6 +223,34 @@ export class Colaboradores implements OnInit {
     }
   }
 
+  solicitarCadastroFacial(colaboradorId: string): void {
+    if (confirm('Iniciar o cadastro facial para este colaborador? Certifique-se de que ele esteja posicionado corretamente na catraca.')) {
+      this.colaboradorService.iniciarCadastroFacial(colaboradorId).subscribe({
+        next: (response) => alert (`Automação de Borda Iniciada: ${response.message}`),
+        error: (err) => alert(`Falha de Comunicação: ${err.error?.message || 'Catraca offline'}`)
+      });
+    }
+  }
+
+  testarLeitorFacial(id: string) {
+    this.colaboradorService.iniciarReconhecimentoManual(id).subscribe({
+      next: (response) => alert(`Comando de varredura manual enviado. Oleitor processará a resposta em instantes`),
+      error: (err) => alert(`Falha: ${err.error?.message}`)
+    });
+  }
+
+  removerBiometriaFacial(id: string){
+    if (confirm(`ATENÇÃO: Esta ação removerá permanentemente as assinaturas biométricas armazenadas na catraca local, em estrita conformidade com a LGPD. Deseja expurgar os dados?`)){
+      this.colaboradorService.excluirBiometriaFacial(id).subscribe({
+        next: (response) => {
+          alert(`${response.message}`);
+
+          this.loadColaboradores();
+        },
+        error: (err) => alert(`Falha ao expurgar: ${err.error?.message}`)
+      });
+    }
+  }
   // Novo método para visualizar o histórico de um colaborador
   verHistoricoColaborador(colaborador: Colaborador): void {
       this.loading.set(true);

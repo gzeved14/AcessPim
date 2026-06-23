@@ -11,7 +11,7 @@ import type { RegistroAcesso } from "./RegistroAcesso";
 @Entity("colaborador")
 export class Colaborador {
     
-    @PrimaryGeneratedColumn("uuid") //faz o banco de dados gerencia automaticamente um id único para cada usuário
+    @PrimaryGeneratedColumn("uuid") // faz o banco de dados gerencia automaticamente um id único para cada usuário
     id!: string;
 
     // Representa a coluna Nome contendo o valor texto e recusando criação se o input de preenchimento for vazio(nulo).
@@ -34,6 +34,10 @@ export class Colaborador {
     @Column({ type: 'boolean', default: true, nullable: false })
     ativo!: boolean;
 
+    // Por padrão adquire 'false' na criação do registro, sendo ativado apenas após o treino do LBPH.
+    @Column({ type: 'boolean', default: false, nullable: false })
+    biometria_ativa!: boolean;
+
     // Coluna para imagem do perfil que se omitida não faz diferença pro cadastro global.
     @Column({ type: 'text', nullable: true })
     foto_url!: string | null;
@@ -43,7 +47,7 @@ export class Colaborador {
     criado_em!: Date;
 
     @OneToMany("RegistroAcesso", (registro: RegistroAcesso) => registro.colaborador)
-    acessos!: RegistroAcesso[]; //O histórico de um colaborador é a soma de todos os seus registros de entrada e saída.
+    acessos!: RegistroAcesso[]; // O histórico de um colaborador é a soma de todos os seus registros de entrada e saída.
 
     // Cria uma chave associada a chave estrangeira em Área para retornar quais Áreas ele gerencia.
     @OneToMany("Area", (area: Area) => area.responsavel, { nullable: false })

@@ -1,4 +1,5 @@
 <main class="p-8">
+  <span class="text-xs text-yellow-400">Cargo Logado: {{ authService.currentUser()?.cargo }}</span>
   <header class="mb-4 flex items-center justify-between gap-4">
     <h1 class="text-2xl font-bold text-white">Colaboradores</h1>
     @if (isGestor) {
@@ -141,39 +142,76 @@
               [class.text-slate-500]="!colaborador.ativo">{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}
             </td>
             <td class="px-3 py-3 text-sm">
-              <div class="flex gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                
                 @if (isAdmin) {
                   @if (colaborador.ativo) {
                     <button
                       (click)="desativarColaborador(colaborador.id)"
-                      class="px-3 py-1 rounded-md bg-yellow-500 text-white text-xs font-semibold hover:bg-yellow-600 transition-colors cursor-pointer"
+                      class="px-2.5 py-1 rounded-md bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors cursor-pointer"
                     >
                       Desativar
                     </button>
-                  }
-
-                  @if (!colaborador.ativo) {
+                  } @else {
                     <button
                       (click)="ativarColaborador(colaborador.id)"
-                      class="px-3 py-1 rounded-md bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition-colors cursor-pointer"
+                      class="px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
                     >
                       Ativar
                     </button>
                   }
                   <button
                     (click)="excluirColaborador(colaborador.id)"
-                    class="px-3 py-1 rounded-md bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors cursor-pointer"
+                    class="px-2.5 py-1 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors cursor-pointer"
                   > 
                     Excluir
                   </button>
-                } @else if (isOperador || isGestor) {
+                }
+
+                @if (isAdmin || isOperador) {
+                  @if (colaborador.biometria_ativa) {
+                    <button
+                      (click)="solicitarCadastroFacial(colaborador.id)"
+                      class="px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <i class="fa fa-refresh"></i> Recadastrar Face
+                    </button>
+                  } @else {
+                    <button
+                      (click)="solicitarCadastroFacial(colaborador.id)"
+                      class="px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <i class="fa fa-user-plus"></i> Cadastrar Face
+                    </button>
+                  }
+
+                  <button
+                    (click)="testarLeitorFacial(colaborador.id)"
+                    class="px-2.5 py-1 rounded-md bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <i class="fa fa-eye"></i> Testar Leitor
+                  </button>
+                }
+
+                @if ((isAdmin || isGestor) && colaborador.biometria_ativa) {
+                  <button
+                    (click)="removerBiometriaFacial(colaborador.id)"
+                    class="px-2.5 py-1 rounded-md bg-red-700 hover:bg-red-800 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                    title="Expurgar dados faciais em conformidade com a LGPD"
+                  >
+                    <i class="fa fa-shield"></i> Limpar Face
+                  </button>
+                }
+
+                @if (isOperador || isGestor) {
                   <button
                     (click)="verHistoricoColaborador(colaborador)"
-                    class="px-3 py-1 rounded-md bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 transition-colors cursor-pointer"
+                    class="px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer"
                   > 
                     Ver Histórico
                   </button>
                 }
+
               </div>
             </td>
           </tr>

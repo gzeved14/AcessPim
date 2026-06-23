@@ -11,7 +11,7 @@ import cv2
 # Adiciona /edge/src ao path para imports locais
 sys.path.insert(0, str(Path(__file__).parent / "src"))
  
-from face_service import FaceMatch, FaceService
+from services.face_service import FaceMatch, FaceService
 from network_service import NetworkService, PayloadRegistro
 # URL do seu servidor Node.js local
 URL_SERVIDOR = "http://localhost:3000/api/registro"
