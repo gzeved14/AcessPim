@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 // 2. Segurança e CORS (Configuração Oficial para Deploy)
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL, // No deploy final em nuvem, você pode trocar '*' pelo domínio do front-end
+  origin:'https://accesspim.dev', // No deploy final em nuvem, você pode trocar '*' pelo domínio do front-end
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
