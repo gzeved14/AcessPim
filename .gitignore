@@ -47,3 +47,8 @@ requirements.orig.txt
 
 # Docker
 docker-compose.override.yml # Ignorar overrides locais do Docker Compose
+
+# Modelos e Dados da Inteligência Artificial
+edge/src/classificador_lbph.yml
+edge/src/classificador_lbph_labels.npy
+edge/src/dataset/
