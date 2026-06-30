@@ -10,7 +10,7 @@ import { Colaborador } from '../../../core/models/colaborador.model';
 import { AreaService } from '../../../core/services/area.service';
 import { ColaboradorService } from '../../../core/services/colaborador.service';
 import { RegistroAcessoService } from '../../../core/services/registro-acesso.service';
-import { AuthService } from '../../../core/auth/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-registrar-acesso',

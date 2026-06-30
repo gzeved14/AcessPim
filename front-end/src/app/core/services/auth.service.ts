@@ -82,7 +82,9 @@ export class AuthService {
 
     clearSession(): void {
         if (isPlatformBrowser(this.platformId)) {
-            localStorage.clear(); // Limpa tokens e dados do usuário
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            localStorage.removeItem(USER_KEY);
         }
         this.state.set({ usuario: null, accessToken: null });
     }

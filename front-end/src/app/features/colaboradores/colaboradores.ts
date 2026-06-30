@@ -5,7 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http'; // Importar HttpErrorR
 import { Colaborador } from '../../core/models/colaborador.model';
 import { ColaboradorService } from '../../core/services/colaborador.service';
 import { CARGO_COLABORADOR_OPTIONS } from '../../core/types/CargoColaborador';
-import { AuthService } from '../../core/auth/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { AcessoService } from '../../core/services/acesso.service'; // Importar AcessoService
 import { Perfil } from '../../core/models/perfil.enum';
 import { RegistroAcesso } from '../../core/models/registro-acesso.model'; // Importar RegistroAcesso

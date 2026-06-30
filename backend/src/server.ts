@@ -9,7 +9,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { appDataSource } from './config/appDataSource'; 
 
 const app = express();
-app.set('trust proxy', false); 
+app.set('trust proxy', 1); 
 
 // 1. Logs de Requisição (Para você ver tudo o que chega no terminal)
 app.use((req, res, next) => {
@@ -20,9 +20,10 @@ app.use((req, res, next) => {
 // 2. Segurança e CORS (Configuração Oficial para Deploy)
 app.use(helmet());
 app.use(cors({
-  origin:'https://accesspim.dev', // No deploy final em nuvem, você pode trocar '*' pelo domínio do front-end
+  origin: ['https://accesspim.dev', 'http://localhost:4200'], // No deploy final em nuvem, você pode trocar '*' pelo domínio do front-end
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(express.json());

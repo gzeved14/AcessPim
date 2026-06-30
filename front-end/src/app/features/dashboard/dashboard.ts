@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { AuthService } from '../../core/auth/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { DashboardCards, DashboardData, AreaOccupancyItem, HourlyAccess } from '../../core/models/dashboard.model';
 import { DashboardService } from '../../core/services/dashboard.service';
 
