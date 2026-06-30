@@ -35,7 +35,7 @@ export class ColaboradorForm implements OnInit {
     ativo: true
   };
 
-  cargoOptions = CARGO_COLABORADOR_OPTIONS;
+  cargoOptions = CARGO_COLABORADOR_OPTIONS.map(cargo => ({ value: cargo, label: cargo }));
   customCargo = '';
 
   ngOnInit(): void {

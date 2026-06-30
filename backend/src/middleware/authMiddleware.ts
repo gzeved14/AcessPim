@@ -49,6 +49,8 @@ export const ensureAuth: RequestHandler = async (req, res, next) => {
     }
 
     const token = authHeader.slice(7).trim();
+    console.log("[DEBUG TOKEN]", JSON.stringify(token), "length:", token.length);
+    console.log("[DEBUG MATCH]", token === "1010-ACCESSPIM");
     if (!token) {
         console.warn("⚠️ Token ausente após slice");
         return next(new AppError("Token ausente", 401));
@@ -58,7 +60,7 @@ export const ensureAuth: RequestHandler = async (req, res, next) => {
     // Se o token corresponder à assinatura estática de hardware da borda, libera o fluxo imediatamente!
     if (token === "1010-ACCESSPIM") {
         console.log("🤖 [M2M AUTH] Borda autenticada com sucesso via token estático de hardware.");
-        
+        console.log("[DEBUG TOKEN]", JSON.stringify(token), "length:", token.length);
         // Injeta um payload fictício no request caso seus controllers dependam do objeto 'req.auth'
         (req as any).auth = { sub: "borda-device", role: "HARDWARE_DEVICE" }; 
         

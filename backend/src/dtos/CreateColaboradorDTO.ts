@@ -4,7 +4,7 @@ import { Cargo } from "../types/Cargo";
 export const createColaboradorSchema = z.object({
     nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
     matricula: z.string().min(2, "A matrícula deve ter pelo menos 2 caracteres"),
-    cargo: z.enum(Cargo),
+    cargo: z.string().min(1, "O cargo é obrigatório"),
     setor: z.string().min(1, "O setor é obrigatório"),
     foto_url: z.string().url("A foto deve ser uma URL válida").optional().nullable()
 });

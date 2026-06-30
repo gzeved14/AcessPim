@@ -31,7 +31,8 @@ export class SidebarComponent {
   ];
 
   protected readonly adminMenuItems = [
-    { label: 'Novo Usuário', link: '/usuarios/novo', hint: 'Apenas Administrador', icon: 'fa-solid fa-user-shield' }
+    { label: 'Novo Usuário', link: '/usuarios/novo', hint: 'Apenas Administrador', icon: 'fa-solid fa-user-shield' },
+    { label: 'Permissões de Área', link: '/permissoes', hint: 'Matriz de direitos de acesso', icon: 'fa-solid fa-key' }
   ];
 
   toggleSidebar(): void {

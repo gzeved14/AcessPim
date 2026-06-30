@@ -60,10 +60,10 @@ export class AcessoService {
         // Verifica se existe uma autorização para o cargo do colaborador na área especificada.
         // Verifica se existe uma autorização para este cargo nesta área
         const autorizacao = await this.autorizacaoRepo.findOne({
-            where: {
-                area: { id: areaId },
-                cargo: colaborador.cargo,
-            },
+            where: [ 
+                { area: { id: areaId }, colaborador: { id: colaboradorId } },
+                { area: { id: areaId }, cargo: colaborador.cargo }
+            ],
         });
         // Se não houver autorização, retorna falso.
         if (!autorizacao) {
@@ -264,7 +264,7 @@ export class AcessoService {
                 .getOne();
             if (entradaSemSaida) {
                 result.autorizado = false;
-                result.motivo = "Colaborador já está em uma área. É necessário registrar a saída antes de uma nova entrada.";
+                result.motivo = `Acesso negado. O colaborador ${colaborador.nome} não possui direitos de trânsito vinculados a esta área.`;
                 return result;
             }
         }
@@ -372,6 +372,52 @@ export class AcessoService {
             },
             relations: ["colaborador", "area", "registrado_por"],
             order: { timestamp: "DESC" }
+        });
+    }
+
+    /**
+     * @method findUltimoRegistro
+     * @description Retorna o último registro de acesso de um colaborador específico.
+     * @param colaboradorId - ID do colaborador
+     */
+    async findUltimoRegistro(colaboradorId: string, areaId: string) {
+        return await this.repo.findOne({
+            where: { 
+                colaborador: { id: colaboradorId }, 
+                area: { id: areaId } 
+            },
+            order: { timestamp: 'DESC' }
+        });
+    }
+
+    /**
+     * @method atualizarPermissoesArea
+     * @description Limpa e redefine os acessos explícitos de um colaborador ( Many-to-Many via tabela pivô)
+     */
+    async atualizarPermissoesAreas(colaboradorId: string, areaIds: string[]): Promise<void> {
+        
+        await this.autorizacaoRepo.delete({ colaborador: { id: colaboradorId } });
+        
+        if (areaIds && areaIds.length > 0) {
+            const novasAutorizacoes = areaIds.map((idDaArea) => {
+                return this.autorizacaoRepo.create({
+                    colaborador: { id: colaboradorId } as Colaborador,
+                    area: {id: idDaArea } as Area
+                });
+            });
+
+            await this.autorizacaoRepo.save(novasAutorizacoes);
+        }
+    }
+
+    /**
+     * @method buscarPermissoesAtuais
+     * @description Retorna a matriz de áreas autorizadas de um funcionário para marcar os checkboxes
+     */
+    async buscarPermissoesAtuais(colaboradorId: string): Promise<Autorizacao[]> {
+        return await this.autorizacaoRepo.find({
+            where: { colaborador: { id: colaboradorId } },
+            relations: ["area"]
         });
     }
 }

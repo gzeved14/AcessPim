@@ -32,13 +32,16 @@
         </li>
       }
       @if (userCargo() === 'ADMIN') {
-        <li *ngIf="!collapsed" class="mt-4 mb-1 px-4 text-xs text-gray-500 uppercase tracking-wider">Administração</li>
+        @if (!collapsed) {
+          <li class="mt-4 mb-1 px-4 text-xs text-gray-500 uppercase tracking-wider transition-all">Administração</li>
+        }
+        
         @for (item of adminMenuItems; track item.link) {
           <li>
             <a [routerLink]="item.link" routerLinkActive="bg-gray-700 text-white" class="group flex items-center gap-3 rounded-md px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition font-medium justify-start" (click)="onNavigate()">
               <i [class]="item.icon + ' w-5 text-lg'" aria-hidden="true"></i>
               <span *ngIf="!collapsed">{{ item.label }}</span>
-              <span *ngIf="collapsed" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
+              <span *ngIf="collapsed" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible z-50">
                 {{ item.label }}
               </span>
             </a>

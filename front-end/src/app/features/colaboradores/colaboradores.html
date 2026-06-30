@@ -1,109 +1,92 @@
-<main class="p-8">
-  <span class="text-xs text-yellow-400">Cargo Logado: {{ authService.currentUser()?.cargo }}</span>
-  <header class="mb-4 flex items-center justify-between gap-4">
-    <h1 class="text-2xl font-bold text-white">Colaboradores</h1>
-    @if (isGestor) {
-    <button
-      (click)="verHistoricoGestor()" 
-      class="px-3 py-1 rounded-md bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-colors cursor-pointer"
-    >
-      Ver Histórico da Minha Área
-    </button>
-  }
-    @if (isAdmin) {
-    <button
-      type="button" 
-      class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 custom-green-button cursor-pointer"
-      (click)="openCreateForm()"
-    >
-      + Adicionar novo colaborador
-    </button>
-   }
-  </header>
+<div class="p-6 max-w-7xl mx-auto">
+  <span class="text-xs text-yellow-400 font-semibold tracking-wide">Cargo Logado: {{ authService.currentUser()?.cargo }}</span>
+  
+  <div class="flex justify-between items-center mb-8 mt-1">
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-1">Colaboradores</h2>
+      <p class="text-slate-400 text-base">Gerencie a equipe e as permissões de biometria facial de borda.</p>
+    </div>
+    
+    <div class="flex gap-3">
+      <button type="button" class="bg-emerald-600 border border-emerald-500 text-white px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-emerald-500 flex items-center gap-2" 
+        (click)="ligarCatraca()" title="Inicia a câmera e o laço de reconhecimento">
+        <div class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
+         Ligar Catraca Facial
+      </button>
+      
+      <button type="button" class="bg-red-600 border border-red-500 text-white px-6 py-2 rounded-lg shadow cursor-pointer font-semibold transition-colors hover:bg-red-500 flex items-center gap-2" 
+        (click)="desligarCatraca()" title="Encerra o processo da câmera">
+        <div class="h-2 w-2 rounded-full bg-rose-500"></div>
+         Desligar Catraca
+      </button>
+
+      @if (isGestor) {
+        <button (click)="verHistoricoGestor()" class="bg-zinc-700 border border-zinc-600 text-slate-300 hover:bg-zinc-600 font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none">
+          Ver Histórico da Minha Área
+        </button>
+      }
+      
+      @if (isAdmin) {
+        <button type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition flex items-center gap-2 cursor-pointer border-none" (click)="openCreateForm()">
+          <i class="fa fa-plus"></i> Adicionar novo colaborador
+        </button>
+      }
+    </div>
+  </div>
 
   @if (showCreateForm()) {
-    <section class="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 class="text-lg font-semibold text-slate-800">Novo colaborador</h2>
+    <section class="bg-zinc-900 rounded-xl shadow-lg p-5 mb-6 text-slate-200 border border-zinc-800">
+      <h2 class="text-lg font-bold text-white mb-4">Novo colaborador</h2>
 
       @if (createErrorMessage()) {
-        <p class="mt-3 text-sm text-red-700">{{ createErrorMessage() }}</p>
+        <p class="mb-4 text-sm text-red-400 bg-red-950/20 p-3 rounded-md border border-red-900/30">{{ createErrorMessage() }}</p>
       }
 
-      <form class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2" (ngSubmit)="submitNovoColaborador()">
-        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Nome
-          <input
-            name="nome"
-            [(ngModel)]="novoColaborador.nome"
-            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-            required
-          />
-        </label>
+      <form class="grid grid-cols-1 md:grid-cols-2 gap-4" (ngSubmit)="submitNovoColaborador()">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Nome</label>
+          <input name="nome" [(ngModel)]="novoColaborador.nome" required
+            class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+        </div>
 
-        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Matricula
-          <input
-            name="matricula"
-            [(ngModel)]="novoColaborador.matricula"
-            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-            required
-          />
-        </label>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Matrícula</label>
+          <input name="matricula" [(ngModel)]="novoColaborador.matricula" required
+            class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+        </div>
 
-        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Cargo
-          <select
-            name="cargo"
-            [(ngModel)]="novoColaborador.cargo"
-            (change)="onCargoChange()"
-            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-            required
-          >
-            <option value="" disabled>Selecione um cargo</option>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Cargo</label>
+          <select name="cargo" [(ngModel)]="novoColaborador.cargo" (change)="onCargoChange()" required
+            class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500 [color-scheme:dark]">
+            <option value="" disabled class="text-slate-500">Selecione um cargo</option>
             @for (cargo of cargoOptions; track cargo) {
               <option [value]="cargo">{{ cargo }}</option>
             }
             <option value="Outros">Outros</option>
           </select>
-        </label>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-semibold text-slate-400">Setor</label>
+          <input name="setor" [(ngModel)]="novoColaborador.setor" required
+            class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+        </div>
 
         @if (showCustomCargo()) {
-          <label class="flex flex-col gap-1 text-sm font-medium text-slate-700 md:col-span-2">
-            Digite o cargo
-            <input
-              name="customCargo"
-              [(ngModel)]="customCargo"
-              type="text"
-              placeholder="Ex: Técnico Especializado, Operador Sênior, etc..."
-              class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-              required
-            />
-          </label>
+          <div class="flex flex-col gap-1.5 md:col-span-2">
+            <label class="text-[13px] font-semibold text-slate-400">Digite o cargo</label>
+            <input name="customCargo" [(ngModel)]="customCargo" type="text" required placeholder="Ex: Técnico Especializado, Operador Sênior..."
+              class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2.5 rounded-md focus:outline-none focus:border-teal-500">
+          </div>
         }
 
-        <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Setor
-          <input
-            name="setor"
-            [(ngModel)]="novoColaborador.setor"
-            class="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500"
-            required
-          />
-        </label>
-
-        <div class="col-span-full flex justify-end gap-2">
-          <button
-            type="button"
-            class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
-            (click)="closeCreateForm()" class="cursor-pointer"
-          >
+        <div class="col-span-full flex justify-end gap-3 mt-4">
+          <button type="button" class="bg-transparent border border-zinc-600 text-slate-300 px-5 py-2 rounded-md hover:bg-zinc-800 transition cursor-pointer font-medium" (click)="closeCreateForm()">
             Cancelar
           </button>
-          <button
-            type="submit"
-            class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
-            [disabled]="createLoading() || (showCustomCargo() && !customCargo.trim())"
-          >
+          <button type="submit" [disabled]="createLoading() || (showCustomCargo() && !customCargo.trim())"
+            class="bg-blue-600/20 border border-blue-500 text-blue-300 hover:bg-blue-500 hover:text-white px-6 py-2 rounded-md transition cursor-pointer font-medium">
             {{ createLoading() ? 'Salvando...' : 'Salvar colaborador' }}
           </button>
         </div>
@@ -111,135 +94,124 @@
     </section>
   }
 
-  <!-- Erro amigavel exibido quando a API retorna falha -->
   @if (errorMessage()) {
-    <p class="mt-4 text-sm text-red-700">{{ errorMessage() }}</p>
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-red-400 shadow border border-zinc-800 mb-6">
+      <i class="fa fa-exclamation-triangle text-2xl mb-2"></i>
+      <div>{{ errorMessage() }}</div>
+    </div>
   }
+  
   @if (loading()) {
-    <p class="mt-4 text-slate-600">Carregando colaboradores...</p>
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow border border-zinc-800">
+      <i class="fa fa-spinner fa-spin text-2xl mb-2"></i>
+      <div>Carregando colaboradores...</div>
+    </div>
   } @else if (colaboradores().length === 0) {
-    <p class="mt-4 text-slate-600">Nenhum colaborador foi encontrado para a consulta atual.</p>
+    <div class="text-center p-12 bg-zinc-900 rounded-xl text-slate-400 shadow border border-zinc-800">
+      <i class="fa fa-users text-5xl mb-4 text-slate-500"></i>
+      <p>Nenhum colaborador cadastrado no sistema.</p>
+    </div>
   } @else {
-    <!-- Tabela da listagem de colaboradores -->
-    <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
-      <table class="min-w-full divide-y divide-slate-200">
-      <thead class="bg-slate-50">
-        <tr>
-          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Nome</th>
-          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Matricula</th>
-          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Cargo</th>
-          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Status</th>
-          <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Ações</th> <!-- Ações column is always present -->
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        @for (colaborador of colaboradores(); track colaborador.id) {
-          <tr>
-            <td class="px-3 py-3 text-sm text-slate-800">{{ colaborador.nome }}</td>
-            <td class="px-3 py-3 text-sm text-slate-700">{{ colaborador.matricula }}</td>
-            <td class="px-3 py-3 text-sm text-slate-700">{{ formatarCargo(colaborador.cargo) }}</td>
-            <td class="px-3 py-3 text-sm font-medium" [class.text-emerald-700]="colaborador.ativo"
-              [class.text-slate-500]="!colaborador.ativo">{{ colaborador.ativo ? 'Ativo' : 'Inativo' }}
-            </td>
-            <td class="px-3 py-3 text-sm">
-              <div class="flex flex-wrap items-center gap-2">
-                
-                @if (isAdmin) {
-                  @if (colaborador.ativo) {
-                    <button
-                      (click)="desativarColaborador(colaborador.id)"
-                      class="px-2.5 py-1 rounded-md bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors cursor-pointer"
-                    >
-                      Desativar
-                    </button>
-                  } @else {
-                    <button
-                      (click)="ativarColaborador(colaborador.id)"
-                      class="px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
-                    >
-                      Ativar
-                    </button>
-                  }
-                  <button
-                    (click)="excluirColaborador(colaborador.id)"
-                    class="px-2.5 py-1 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors cursor-pointer"
-                  > 
-                    Excluir
-                  </button>
-                }
-
-                @if (isAdmin || isOperador) {
-                  @if (colaborador.biometria_ativa) {
-                    <button
-                      (click)="solicitarCadastroFacial(colaborador.id)"
-                      class="px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                    >
-                      <i class="fa fa-refresh"></i> Recadastrar Face
-                    </button>
-                  } @else {
-                    <button
-                      (click)="solicitarCadastroFacial(colaborador.id)"
-                      class="px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                    >
-                      <i class="fa fa-user-plus"></i> Cadastrar Face
-                    </button>
-                  }
-
-                  <button
-                    (click)="testarLeitorFacial(colaborador.id)"
-                    class="px-2.5 py-1 rounded-md bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                  >
-                    <i class="fa fa-eye"></i> Testar Leitor
-                  </button>
-                }
-
-                @if ((isAdmin || isGestor) && colaborador.biometria_ativa) {
-                  <button
-                    (click)="removerBiometriaFacial(colaborador.id)"
-                    class="px-2.5 py-1 rounded-md bg-red-700 hover:bg-red-800 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                    title="Expurgar dados faciais em conformidade com a LGPD"
-                  >
-                    <i class="fa fa-shield"></i> Limpar Face
-                  </button>
-                }
-
-                @if (isOperador || isGestor) {
-                  <button
-                    (click)="verHistoricoColaborador(colaborador)"
-                    class="px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer"
-                  > 
-                    Ver Histórico
-                  </button>
-                }
-
-              </div>
-            </td>
+    
+    <div class="bg-zinc-900 rounded-xl shadow-lg overflow-hidden text-slate-200 border border-zinc-800">
+      <table class="w-full border-collapse text-left">
+        <thead>
+          <tr class="bg-zinc-800">
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Nome</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Matrícula</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Cargo</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Status</th>
+            <th class="p-4 border-b border-zinc-700 text-slate-100 font-semibold">Ações</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (colaborador of colaboradores(); track colaborador.id) {
+            <tr class="hover:bg-zinc-800/50 transition">
+              <td class="p-4 border-b border-zinc-800 font-medium text-white">{{ colaborador.nome }}</td>
+              <td class="p-4 border-b border-zinc-800 text-slate-400 text-sm">{{ colaborador.matricula }}</td>
+              <td class="p-4 border-b border-zinc-800 text-slate-400 text-sm">{{ formatarCargo(colaborador.cargo) }}</td>
+              <td class="p-4 border-b border-zinc-800">
+                <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase"
+                  [ngClass]="colaborador.ativo ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-zinc-800 text-slate-400 border border-zinc-700'">
+                  {{ colaborador.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="p-4 border-b border-zinc-800">
+                <div class="flex flex-wrap items-center gap-2">
+                  
+                  @if (isAdmin) {
+                    @if (colaborador.ativo) {
+                      <button (click)="desativarColaborador(colaborador.id)" class="px-3 py-1 rounded bg-zinc-800 border border-zinc-700 text-amber-400 hover:bg-zinc-700 text-xs font-semibold transition-colors cursor-pointer">
+                        Desativar
+                      </button>
+                    } @else {
+                      <button (click)="ativarColaborador(colaborador.id)" class="px-3 py-1 rounded bg-emerald-600/20 border border-emerald-500 text-emerald-400 hover:bg-emerald-600 hover:text-white text-xs font-semibold transition-colors cursor-pointer">
+                        Ativar
+                      </button>
+                    }
+                    <button (click)="excluirColaborador(colaborador.id)" class="px-3 py-1 rounded bg-red-600/20 border border-red-500 text-red-400 hover:bg-red-500 hover:text-white text-xs font-semibold transition-colors cursor-pointer">
+                      Excluir
+                    </button>
+                  }
+
+                  @if (isAdmin || isOperador) {
+                    @if (colaborador.biometria_ativa) {
+                      <button (click)="solicitarCadastroFacial(colaborador.id)" class="px-3 py-1 rounded bg-blue-600/20 border border-blue-500 text-blue-300 hover:bg-blue-500 hover:text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1">
+                        <i class="fa fa-refresh"></i> Recadastrar Face
+                      </button>
+                    } @else {
+                      <button (click)="solicitarCadastroFacial(colaborador.id)" class="px-3 py-1 rounded bg-emerald-600/20 border border-emerald-500 text-emerald-400 hover:bg-emerald-600 hover:text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1">
+                        <i class="fa fa-user-plus"></i> Cadastrar Face
+                      </button>
+                    }
+                  }
+
+                  @if ((isAdmin || isGestor) && colaborador.biometria_ativa) {
+                    <button (click)="removerBiometriaFacial(colaborador.id)" title="Expurgar dados faciais" class="px-3 py-1 rounded bg-zinc-800 border border-zinc-700 text-slate-400 hover:bg-zinc-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1">
+                      <i class="fa fa-shield"></i> Limpar Face
+                    </button>
+                  }
+
+                  @if (isOperador || isGestor) {
+                    <button (click)="verHistoricoColaborador(colaborador)" class="px-3 py-1 rounded bg-zinc-800 border border-zinc-700 text-slate-300 hover:bg-zinc-700 text-xs font-semibold transition-colors cursor-pointer">
+                      Histórico
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
 
     @if (showColaboradorHistoryModal()) {
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-slate-900">Histórico de Acessos de {{ selectedColaboradorName() }}</h3>
-            <button (click)="closeColaboradorHistoryModal()" class="text-slate-500 hover:text-slate-700 cursor-pointer">
-              <i class="fa fa-times"></i>
+      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-6 w-full max-w-lg">
+          <div class="flex justify-between items-center mb-5 border-b border-zinc-800 pb-3">
+            <h3 class="text-lg font-bold text-white">Histórico de Acessos: <span class="text-blue-400">{{ selectedColaboradorName() }}</span></h3>
+            <button (click)="closeColaboradorHistoryModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+              <i class="fa fa-times text-xl"></i>
             </button>
           </div>
+          
           @if (selectedColaboradorHistory().length === 0) {
-            <p class="text-sm text-slate-600">Nenhum registro de acesso encontrado.</p>
+            <p class="text-sm text-slate-400 text-center py-4">Nenhum registro de acesso encontrado.</p>
           } @else {
-            <ul class="space-y-2 max-h-60 overflow-y-auto">
+            <ul class="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
               @for (registro of selectedColaboradorHistory(); track registro.id) {
-                <li class="p-2 border border-slate-200 rounded-md text-sm text-slate-700">
-                  <strong>{{ registro.tipo }}</strong> em <strong>{{ registro.area?.nome || 'Área Desconhecida' }}</strong>
-                  <span class="text-slate-500"> ({{ registro.timestamp | date: 'dd/MM/yyyy HH:mm' }})</span>
-                  @if (!registro.autorizado) {
-                    <span class="text-red-500 ml-2">(NEGADO)</span>
-                  }
+                <li class="p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-slate-300 flex flex-col gap-1">
+                  <div class="flex justify-between items-center">
+                    <span>
+                      <strong class="text-white">{{ registro.tipo }}</strong> em 
+                      <strong class="text-blue-300">{{ registro.area?.nome || 'Área Desconhecida' }}</strong>
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase"
+                      [ngClass]="registro.autorizado ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'">
+                      {{ registro.autorizado ? 'Autorizado' : 'Negado' }}
+                    </span>
+                  </div>
+                  <span class="text-xs text-slate-500"><i class="fa fa-clock mr-1"></i>{{ registro.timestamp | date: 'dd/MM/yyyy HH:mm' }}</span>
                 </li>
               }
             </ul>
@@ -248,4 +220,4 @@
       </div>
     }
   }
-</main>
+</div>

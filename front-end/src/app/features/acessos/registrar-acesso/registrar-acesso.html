@@ -95,30 +95,22 @@
             
             <div class="flex-1">
               <h3 class="font-semibold mb-2" [ngClass]="previewResult().autorizado ? 'text-emerald-400' : 'text-red-400'">
-                {{ previewResult().autorizado ? 'Autorizado' : 'Não Autorizado' }}
+                {{ previewResult().autorizado ? 'Acesso Liberado' : 'Acesso Bloqueado' }}
               </h3>
               
-              <p class="text-sm text-slate-300 mb-3">
+              <p class="text-sm text-slate-300 mb-3 leading-relaxed">
                 {{ previewResult().motivo }}
               </p>
               
-              <div class="grid grid-cols-2 gap-2 text-xs text-slate-400">
+              <div class="flex gap-6 text-xs text-slate-400 border-t border-slate-700/50 pt-3">
                 <div>
-                  <span class="block font-semibold text-slate-300">Colaborador:</span>
-                  {{ previewResult().colaborador_nome }}
-                </div>
-                <div>
-                  <span class="block font-semibold text-slate-300">Cargo:</span>
-                  {{ previewResult().colaborador_cargo }}
-                </div>
-                <div>
-                  <span class="block font-semibold text-slate-300">Área:</span>
+                  <span class="font-semibold text-slate-300 mr-1">Área Alvo:</span>
                   {{ previewResult().area_nome }}
                 </div>
                 @if (previewResult().detalhes?.capacidade) {
                   <div>
-                    <span class="block font-semibold text-slate-300">Capacidade:</span>
-                    {{ previewResult().detalhes.ocupacao_futura || previewResult().detalhes.ocupacao_atual }}/{{ previewResult().detalhes.capacidade }}
+                    <span class="font-semibold text-slate-300 mr-1">Lotação:</span>
+                    {{ previewResult().detalhes.ocupacao_futura || previewResult().detalhes.ocupacao_atual }} de {{ previewResult().detalhes.capacidade }}
                   </div>
                 }
               </div>

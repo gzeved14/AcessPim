@@ -4,6 +4,12 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Colaborador } from '../models/colaborador.model';
 
+
+export interface BiometriaResponse {
+  message: string;
+  status?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ColaboradorService {
   // Base da API de colaboradores usada em CRUD e consultas.
@@ -43,23 +49,27 @@ export class ColaboradorService {
    * Dispara o inicio do Cadastro/Recadastro Facial na catraca da borda.
    * Liberado para OPERADOR, GESTOR e ADMIN.
    */
-  iniciarCadastroFacial(colaboradorId: string): Observable<any> {
-    return this.http.post(`${this.API}/cadastrar-rosto`, { colaborador_id: colaboradorId });
+  iniciarCadastroFacial(colaboradorId: string): Observable<BiometriaResponse> {
+    return this.http.post<BiometriaResponse>(`${environment.apiUrl}/registro/biometria/cadastrar`, {colaboradorId});
   }
   
   /**
    * Dispara uma verificação manual de reconhecimento facial na catraca da borda.
    */
-  iniciarReconhecimentoManual(colaboradorId: string): Observable<any> {
-    return this.http.post(`${this.API}/${colaboradorId}/reconhecer`, {});
+  iniciarReconhecimentoManual(): Observable<BiometriaResponse> {
+    return this.http.post<BiometriaResponse>(`${environment.apiUrl}/registro/biometria/iniciar`, {});
+  }
+
+  desligarReconhecimento() {
+    return this.http.post<BiometriaResponse>(`${environment.apiUrl}/registro/biometria/parar`, {});
   }
 
   /**
    * Expuga definitivamente os dados biométricos da borda (LGPD) 
    * Restrito a ADMIN e GESTOR.
    */
-  excluirBiometriaFacial(colaboradorId: string): Observable<any>{
-    return this.http.delete(`${this.API}/${colaboradorId}/facial`);
+  excluirBiometriaFacial(colaboradorId: string): Observable<BiometriaResponse>{
+    return this.http.delete<BiometriaResponse>(`${environment.apiUrl}/registro/biometria/excluir`, { body: { colaboradorId } });
   }
   
   // US08: Alternar status ativo/inativo (sem deletar histórico)

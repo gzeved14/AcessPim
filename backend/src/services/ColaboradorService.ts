@@ -135,7 +135,8 @@ export class ColaboradorService {
             console.log(`📡 [INTEGRAÇÃO] Enviando comando de abertura de câmera para a catraca... Colaborador: ${colaborador.nome}`);
             
             // URL da catraca física (IP local da máquina Advantech/ADLINK onde o Python roda)
-            const urlCatracaPython = "http://172.20.10.2:5000/api/borda/cadastrar";            // Dispara a chamada HTTP para o Python iniciar a captura das 50 fotos
+            // Remova temporariamente o process.env desse trecho e trave assim:
+            const urlCatracaPython = "http://127.0.0.1:5000/api/borda/cadastrar";
             const respostaBorda = await axios.post(urlCatracaPython, {
                 colaborador_id: colaborador.id
             }, { timeout: 60000 }); // Timeout longo (1 minuto) para dar tempo do usuário se posicionar

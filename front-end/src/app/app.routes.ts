@@ -76,10 +76,14 @@ loadComponent: () => import('./features/acessos/registrar-acesso/registrar-acess
     canActivate: [authGuard], 
     loadComponent: () => import('./features/usuarios/usuario-form/usuario-form').then(m => m.UsuarioForm) 
   },
+  {
+    path: 'permissoes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/permissoes/permissoes').then(m => m.PermissoesComponent)
+  },
   // Fallback para rotas inexistentes.
   {
     path: '**',
     redirectTo: 'login',
-  },
-  
+  }  
 ];

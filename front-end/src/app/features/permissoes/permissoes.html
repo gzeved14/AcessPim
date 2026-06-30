@@ -1,0 +1,104 @@
+<div class="p-6 max-w-[1200px] mx-auto text-slate-300">
+  
+  <div class="mb-6">
+    <h2 class="text-slate-200 text-2xl font-bold m-0">Níveis e Direitos de Acesso</h2>
+    <p class="text-slate-400 text-sm mt-1">Vincule colaboradores às áreas críticas da planta industrial para liberação nas catracas.</p>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="p-4 mb-6 bg-red-500/10 text-red-500 rounded border border-red-500/20 text-sm flex items-center gap-2">
+      <i class="fa fa-exclamation-circle"></i> {{ errorMessage() }}
+    </div>
+  }
+  @if (successMessage()) {
+    <div class="p-4 mb-6 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20 text-sm flex items-center gap-2">
+      <i class="fa fa-check-circle"></i> {{ successMessage() }}
+    </div>
+  }
+
+  <div class="bg-[#24303F] p-6 rounded-sm border border-[#313D4A] shadow-md flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6">
+    
+    <div class="flex flex-col gap-2 flex-1 max-w-md">
+      <label for="colaboradorSelect" class="font-semibold text-slate-400 text-xs uppercase tracking-wider">
+        Funcionário Alvo
+      </label>
+      <select id="colaboradorSelect" 
+              [ngModel]="colaboradorSelecionado()" 
+              (ngModelChange)="colaboradorSelecionado.set($event); onColaboradorChange()"
+              [disabled]="loading()"
+              class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400 disabled:opacity-50 disabled:cursor-not-allowed w-full transition-colors">
+        <option value="" disabled>Selecione um funcionário para gerenciar...</option>
+        @for (colab of colaboradores(); track colab.id) {
+          <option [value]="colab.id">{{ colab.nome }} ({{ colab.matricula }})</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <button type="button" 
+              (click)="salvarPermissoes()" 
+              [disabled]="loading() || !colaboradorSelecionado() || loadingPermissoes()"
+              class="w-full md:w-auto px-6 py-2.5 rounded bg-blue-600 text-white hover:bg-blue-700 font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer border-none shadow-sm">
+        @if (loading() && colaboradorSelecionado()) {
+          <i class="fa fa-spinner fa-spin"></i> Salvando...
+        } @else {
+          <i class="fa fa-save"></i> Salvar Matriz de Permissões
+        }
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-[#24303F] p-6 rounded-sm border border-[#313D4A] shadow-md">
+    <h3 class="text-slate-200 text-base font-semibold mb-4 pb-2 border-b border-[#313D4A] flex items-center gap-2">
+      <i class="fa fa-shield-alt text-teal-400"></i> Áreas Operacionais Controladas
+    </h3>
+
+    @if (loading() || loadingPermissoes()) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" aria-busy="true">
+        @for (item of [1,2,3]; track $index) {
+          <div class="h-[74px] bg-[#1a222c] rounded border border-[#313D4A] animate-pulse"></div>
+        }
+      </div>
+    }
+
+    @else if (colaboradorSelecionado()) {
+      @if (areas().length === 0) {
+        <p class="text-slate-400 text-sm text-center py-6">Nenhuma área cadastrada no sistema.</p>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          @for (area of areas(); track area.id) {
+            <label [class.border-teal-500]="isAreaMarcada(area.id)"
+                   [class.bg-teal-950\/10]="isAreaMarcada(area.id)"
+                   class="flex items-center gap-4 p-4 bg-[#1a222c] rounded border border-[#313D4A] hover:border-slate-500 transition-all cursor-pointer select-none focus-within:ring-2 focus-within:ring-teal-400 focus-within:outline-none">
+              
+              <input type="checkbox" 
+                     [checked]="isAreaMarcada(area.id)" 
+                     (change)="toggleArea(area.id)"
+                     class="w-5 h-5 rounded bg-[#24303F] border-[#313D4A] text-teal-400 focus:ring-0 accent-teal-400 cursor-pointer">
+              
+              <div class="flex flex-col">
+                <span class="font-semibold text-slate-200 text-sm">{{ area.nome }}</span>
+                <span [ngClass]="{
+                  'text-red-400': area.nivelRisco === 'CRITICO' || area.nivelRisco === 'ALTO',
+                  'text-amber-400': area.nivelRisco === 'MEDIO',
+                  'text-emerald-400': area.nivelRisco === 'BAIXO'
+                }" class="text-xs font-medium mt-0.5 uppercase tracking-wider">
+                  Risco: {{ area.nivelRisco }}
+                </span>
+              </div>
+            </label>
+          }
+        </div>
+      }
+    }
+
+    @else {
+      <div class="text-center py-12 border border-dashed border-[#313D4A] rounded-sm bg-[#1a222c]/50">
+        <i class="fa fa-user-lock text-slate-500 text-3xl mb-3"></i>
+        <h4 class="text-slate-300 text-sm font-medium">Nenhum funcionário selecionado</h4>
+        <p class="text-slate-500 text-xs mt-1 max-w-xs mx-auto">Escolha um colaborador no menu superior para visualizar e editar os perímetros de acesso autorizados.</p>
+      </div>
+    }
+  </div>
+
+</div>

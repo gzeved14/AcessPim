@@ -44,36 +44,40 @@ export default class AcessoController {
 
     /**
      * @method create
-     * @description Cria um novo registro de acesso (RF01, RF02, RF03, RF04, RF05, RF06).
-     * Suporta payloads tanto da Catraca Python (Borda) quanto do Balcão Angular (Web).
+     * @description Cria um novo registro de acesso com Lógica Automática de Entrada/Saída.
      */
     async create(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { colaborador_id, area_id, tipo, observacao, autorizado } = req.body;
+            const { colaborador_id, area_id, observacao, autorizado } = req.body;
             
-            // Puxa o ID do token de forma resiliente (suporta req.auth do middleware ou fallback para o Python)
             const authPayload = (req as any).auth;
-            const registrado_por = authPayload?.sub || "SISTEMA_AUTOMATIZADO";
+            const ID_USUARIO_SISTEMA = "2d5071d4-93ad-4900-8667-85416743242b";
+            const registrado_por = authPayload?.sub || ID_USUARIO_SISTEMA;
 
             if (!registrado_por) {
-                throw new AppError("Operador não identificado no token", 401);
+                throw new AppError("Operador não identificado", 401);
             }
 
-            // Normaliza o payload para strings planas casando com a interface RegisterAccessInput do Service
+            // 1. Busca o último registro deste colaborador nesta área específica
+            const ultimoRegistro = await this.accessService.findUltimoRegistro(colaborador_id, area_id);
+
+            // 2. Se o último foi ENTRADA, o próximo é SAIDA. Caso contrário, é ENTRADA.
+            const tipoCalculado = (ultimoRegistro && ultimoRegistro.tipo === 'ENTRADA') ? 'SAIDA' : 'ENTRADA';
+
             const inputDados = {
                 colaborador_id: String(colaborador_id),
                 area_id: String(area_id),
-                tipo: String(tipo),
+                tipo: tipoCalculado, // Agora o sistema decide o tipo!
                 autorizado: Boolean(autorizado),
                 registrado_por: String(registrado_por),
-                observacao: observacao || undefined
+                observacao: observacao || `Acesso automático: ${tipoCalculado}`
             };
 
             const newAccess = await this.accessService.registerAccess(inputDados);
 
             return res.status(201).json({
                 status: "Sucesso!",
-                mensagem: "Log de acesso consolidado na nuvem PostgreSQL!",
+                mensagem: `Registro de ${tipoCalculado} consolidado com sucesso!`,
                 dados: ajustaTimestampsManaus(newAccess)
             });
         } catch (error) {
@@ -208,6 +212,58 @@ export default class AcessoController {
             
             const records = await this.accessService.getHistoryByColaboradorAndArea(colaboradorId, matricula);
             return res.status(200).json(ajustaTimestampsManaus(records));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * @method listarpermissoes
+     * @description Lista as permissões de acesso para o colaborador logado (RF16).
+     */
+    async listarPermissoes(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try { 
+            const { id } = req.params;
+            if (!id || typeof id !== 'string') {
+                throw new AppError("O ID do colaborador é obrigatório.", 400);
+            }
+
+            const permissoes = await this.accessService.buscarPermissoesAtuais(id);
+
+            const idsMapeados = permissoes.map(auth => ({
+
+                id: auth.id, 
+                areaId: auth.area.id
+            }));
+
+            return res.status(200).json(idsMapeados);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * @method salvarPermissoes
+     * @description Atualiza as permissões de acesso para o colaborador logado (RF17).
+     */
+    async salvarPermissoes(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try { 
+            const { colaboradorId, areasIds } = req.body;
+
+            if (!colaboradorId){
+                throw new AppError("O Id do colaboradorId é obrigatório no corpo da requisição.", 400);
+            }
+
+            if (!Array.isArray(areasIds)) {
+                throw new AppError("O campo areasIds deve ser um array contendo os IDs das áreas.", 400);
+            }
+
+            await this.accessService.atualizarPermissoesAreas(colaboradorId, areasIds);
+
+            return res.status(200).json({
+                status: "Sucesso!",
+                message: "Direitos de trânsito em áreas restritas atualizados com sucesso!"
+            });
         } catch (error) {
             next(error);
         }

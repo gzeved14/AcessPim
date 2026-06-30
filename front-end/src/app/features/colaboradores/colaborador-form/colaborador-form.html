@@ -37,8 +37,9 @@
         <select id="cargo" name="cargo" [(ngModel)]="colaborador.cargo" (change)="onCargoChange()" required
           class="p-2.5 rounded bg-[#1a222c] border border-[#313D4A] text-slate-200 focus:outline-none focus:border-teal-400">
           <option value="" disabled>Selecione um cargo</option>
-          @for (cargo of cargoOptions; track cargo) {
-            <option [value]="cargo">{{ cargo }}</option>
+          
+          @for (option of cargoOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
           }
           <option value="Outros">Outros</option>
         </select>

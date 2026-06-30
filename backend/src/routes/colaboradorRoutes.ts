@@ -15,6 +15,7 @@ const colaboradorController = new ColaboradorController(colaboradorService);
 const upload = multer(uploadConfig);
 
 //  Filtro de segurança global para todas as rotas de colaboradores
+colaboradorRoutes.use(ensureAuth);
 
 //  Consultas e Persistência Padrão
 colaboradorRoutes.get("/", colaboradorController.findAll.bind(colaboradorController));

@@ -18,7 +18,7 @@ export const appDataSource = new DataSource({
     username: env.DB_USER,
     password: env.DB_PASSWORD,
     database: env.DB_NAME,
-    synchronize: true,
+    synchronize: false,
     logging: false,
     // Lista explícita para evitar falhas de metadata com glob patterns no runtime ESM.
     entities: [
@@ -30,4 +30,9 @@ export const appDataSource = new DataSource({
         Usuario,
         AccessLogCache
     ],
+
+    extra: {
+        charset: 'UTF8_GENERAL_CI',
+        client_encoding: 'UTF8'
+    }
 });

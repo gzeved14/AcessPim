@@ -26,5 +26,9 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: '**',
     renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'permissoes',
+    renderMode: RenderMode.Client
   }
 ];

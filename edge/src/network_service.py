@@ -137,7 +137,7 @@ class NetworkService:
     Interface de comunicação entre a borda e o backend central.
  
     Uso:
-        svc = NetworkService(base_url="http://192.168.1.100:3000", jwt_token="...")
+        svc = NetworkService(base_url="http://192.168.1.100:3001", jwt_token="...")
         svc.iniciar_sync_automatico()  # inicia thread de sync em background
  
         ok = svc.enviar_registro(payload)
@@ -147,7 +147,7 @@ class NetworkService:
     def __init__(self, base_url: str, jwt_token: str, caminho_db: str = FILA_DB):
         """
         Args:
-            base_url:    URL base do backend (ex: "http://192.168.1.100:3000")
+            base_url:    URL base do backend (ex: "http://192.168.1.100:3001")
             jwt_token:   Token JWT gerado na autenticação da catraca
             caminho_db:  Caminho para o banco SQLite da fila offline
         """

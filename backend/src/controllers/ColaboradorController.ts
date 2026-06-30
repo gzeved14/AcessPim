@@ -103,8 +103,7 @@ export default class ColaboradorController {
 
         try {
             // Unificado com o IP real capturado no ipconfig para pular o isolamento do Docker
-            const urlBorda = process.env.URL_BORDA || 'http://172.20.10.2:5000'; 
-
+			const urlBorda = 'http://127.0.0.1:5000';
             await axios.post(`${urlBorda}/api/borda/reconhecer`, { colaborador_id: id },
                 {
                     headers: { 'Authorization': 'Bearer 1010-ACCESSPIM' }
@@ -132,7 +131,7 @@ export default class ColaboradorController {
 		const { id } = req.params;
 
 		try {
-			const urlBorda = process.env.URL_BORDA || 'http://host.docker.internal:5000';
+			const urlBorda = 'http://127.0.0.1:5000';
 			await axios.post(`${urlBorda}/api/borda/excluir`, {
 				colaborador_id: id
 			}, {

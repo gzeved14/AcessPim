@@ -15,12 +15,12 @@ const routes = Router();
 // ===========================================================================
 routes.use("/auth", authRoutes); // 🟢 Resolve: /api/auth/login sem NENHUMA trava
 
+routes.use(ensureAuth);
+
 // ===========================================================================
 // 🛡️ 2. ROTAS COM PROTEÇÃO BIOMÉTRICA / M2M (Bypass com Token de Hardware)
 // ===========================================================================
 // Injetamos o middleware explicitamente aqui para validar o token '1010-ACCESSPIM'
-routes.use("/colaborador", ensureAuth, collaboradorRoutes);
-routes.use("/registro", ensureAuth, accessRoutes); 
 routes.use("/sync", ensureAuth, syncRoutes);
 
 // ===========================================================================
@@ -28,7 +28,10 @@ routes.use("/sync", ensureAuth, syncRoutes);
 // ===========================================================================
 // Passamos o ensureAuth apenas para os módulos que necessitam de login do painel Angular
 routes.use("/usuario", ensureAuth, userRoutes);
+routes.use("/colaborador", ensureAuth, collaboradorRoutes);
 routes.use("/area", ensureAuth, areaRoutes);
+routes.use("/registro", ensureAuth, accessRoutes);
 routes.use("/dashboard", ensureAuth, dashboardRoutes);
+
 
 export default routes;

@@ -8,135 +8,198 @@ import numpy as np
 import requests
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SRC_DIR = os.path.join(BASE_DIR, 'src')
-if SRC_DIR not in sys.path:
-    sys.path.insert(0, SRC_DIR)
 
+# ---------------------------------------------------------------------------
+# Configurações de Log
+# ---------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Configurações de Bancada
+# Configurações de Bancada e Integração
 # ---------------------------------------------------------------------------
-URL_BACKEND = "http://localhost:3000"
+URL_BACKEND = "http://localhost:3001/api"
 MODELO_YML = os.path.join(BASE_DIR, "classificador_lbph.yml")
 MODELO_LABELS = os.path.join(BASE_DIR, "classificador_lbph_labels.npy")
 CASCADE_PATH = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-CAMERA_INDEX = "http://172.20.10.1:4747/video" # IP do Hotspot do seu celular
 
-THRESHOLD_CONFIANCA = 45.0 # Limiar estável para LBPH aceitar o rosto
-COOLDOWN_REGISTRO = 10     # Segundos de espera para registrar a mesma pessoa
+# 🎯 Stream do DroidCam no Celular
+# Nota: Se o Wi-Fi falhar, altere de "http://..." para 0 para usar o DroidCam via Cabo USB
+CAMERA_INDEX = "http://172.20.10.1:4747/video" 
 
-# ---------------------------------------------------------------------------
-# Inicialização dos Componentes
-# ---------------------------------------------------------------------------
-if not os.path.exists(MODELO_YML) or not os.path.exists(MODELO_LABELS):
-    logger.error("Modelos de reconhecimento não encontrados. Certifique-se de treinar o modelo antes de executar.")
-    sys.exit(1)
+# ID da Área no PostgreSQL (Ex: Sala de Alta Tensão)
+AREA_ID_ALVO = "7aed5dab-311a-4ed2-8b7f-828129832998" 
 
-reconhecedor = cv2.face.LBPHFaceRecognizer_create()
-reconhecedor.read(MODELO_YML)
-mapa_labels = np.load(MODELO_LABELS, allow_pickle=True).item()
+THRESHOLD_CONFIANCA = 60.0 
+COOLDOWN_REGISTRO = 8     # Tempo em segundos para a mesma pessoa passar de novo
 
-cascade = cv2.CascadeClassifier(CASCADE_PATH)
-cap = cv2.VideoCapture(CAMERA_INDEX)
+def main():
+    # ---------------------------------------------------------------------------
+    # 1. Inicialização dos Modelos de IA
+    # ---------------------------------------------------------------------------
+    if not os.path.exists(MODELO_YML) or not os.path.exists(MODELO_LABELS):
+        logger.error("Modelos não encontrados. Execute o Cadastro Facial via Angular primeiro.")
+        sys.exit(1)
 
-if not cap.isOpened():
-    logger.error("Câmera indisponível no endereço: %s", CAMERA_INDEX)
-    sys.exit(1)
+    reconhecedor = cv2.face.LBPHFaceRecognizer_create()
+    reconhecedor.read(MODELO_YML)
+    mapa_labels = np.load(MODELO_LABELS, allow_pickle=True).item()
 
-logger.info("Scanner Facial Ativo. Monitorando acessos...")
+    cascade = cv2.CascadeClassifier(CASCADE_PATH)
+    
+    # ---------------------------------------------------------------------------
+    # 2. Conexão com o Hardware (Celular)
+    # ---------------------------------------------------------------------------
+    logger.info(f"Conectando à câmera: {CAMERA_INDEX}")
+    
+    # cv2.CAP_FFMPEG ajuda muito o OpenCV a entender streams HTTP no Windows
+    cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_FFMPEG)
 
-# Controle de Cooldown local e Estados de Hardware Simulados
-historico_registro = {}
-catraca_liberada = False
-timestamp_liberacao = 0.0
+    if not cap.isOpened():
+        logger.warning("Falha com CAP_FFMPEG, tentando modo padrão...")
+        cap = cv2.VideoCapture(CAMERA_INDEX)
+        if not cap.isOpened():
+            logger.error(f"Câmera indisponível: {CAMERA_INDEX}. Verifique o Wi-Fi ou mude CAMERA_INDEX para 0 (USB).")
+            sys.exit(1)
 
-# ---------------------------------------------------------------------------
-# Loop Principal Contínuo
-# ---------------------------------------------------------------------------
-try:
-    while True:
-        ret, frame = cap.read()
-        if not ret: 
-            continue
-        
-        agora = time.time()
+    cv2.namedWindow("AccessPIM AI - Simulador de Catraca", cv2.WINDOW_AUTOSIZE)
 
-        # ⏳ SIMULAÇÃO NATIVA: Se a tranca passou 5s aberta, bloqueia automaticamente
-        if catraca_liberada and (agora - timestamp_liberacao > 5.0):
-            catraca_liberada = False
-            logger.info("🔒 [MECANISMO] Tempo esgotado. Catraca travada novamente.")
+    # ---------------------------------------------------------------------------
+    # 3. Estados da Catraca e Memória de Curto Prazo
+    # ---------------------------------------------------------------------------
+    historico_registro = {}
+    estado_catraca = "ESPERA"  # ESPERA, LIBERADA, BLOQUEADA
+    timestamp_estado = 0.0
+    nome_usuario_detectado = ""
 
-        cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = cascade.detectMultiScale(cinza, scaleFactor=1.1, minNeighbors=5, minSize=(100, 100))
-        
-        for (x, y, w, h) in faces:
-            roi = cinza[y:y+h, x:x+w]
-            roi_resized = cv2.resize(roi, (200, 200))
+    logger.info("🎬 SIMULADOR VISUAL DE CATRACA INICIADO. Aguardando faces...")
+
+    try:
+        while True:
+            ret, camera_frame = cap.read()
+            if not ret: 
+                logger.warning("Falha ao ler frame da câmera. Tentando novamente...")
+                time.sleep(0.5)
+                continue
             
-            # Executa a predição matemática do LBPH
-            label_sequencial, confianca = reconhecedor.predict(roi_resized)
+            # Ajuste de imagem para Totem Vertical
+            camera_frame = cv2.rotate(camera_frame, cv2.ROTATE_90_CLOCKWISE)
+            camera_frame = cv2.resize(camera_frame, (400, 500))
             
-            cor_moldura = (0, 0, 255) # Vermelho por padrão (não identificado)
-            nome_exibicao = "Desconhecido"
+            agora = time.time()
+
+            # Reseta o painel após 4 segundos
+            if estado_catraca != "ESPERA" and (agora - timestamp_estado > 4.0):
+                estado_catraca = "ESPERA"
+                nome_usuario_detectado = ""
+
+            cinza = cv2.cvtColor(camera_frame, cv2.COLOR_BGR2GRAY)
+            faces = cascade.detectMultiScale(cinza, scaleFactor=1.1, minNeighbors=5, minSize=(90, 90))
             
-            if confianca <= THRESHOLD_CONFIANCA:
-                colaborador_id = mapa_labels.get(label_sequencial, None)
-                if colaborador_id:
-                    nome_exibicao = f"ID: {colaborador_id}"
-                    cor_moldura = (0, 255, 0) # Verde para identificado
+            cor_moldura = (0, 165, 255) # Laranja padrão
+            
+            # ---------------------------------------------------------------------------
+            # 4. Pipeline de Reconhecimento e Integração REST
+            # ---------------------------------------------------------------------------
+            for (x, y, w, h) in faces:
+                roi = cinza[y:y+h, x:x+w]
+                roi_resized = cv2.resize(roi, (200, 200))
+                
+                label_sequencial, confianca = reconhecedor.predict(roi_resized)
+                
+                # Exibe a distância de erro sobre a face
+                cv2.putText(camera_frame, f"Dist: {int(confianca)}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, cor_moldura, 2)
+                
+                if confianca <= THRESHOLD_CONFIANCA:
+                    colaborador_id = mapa_labels.get(label_sequencial, None)
                     
-                    # Verificar se o colaborador saiu do tempo de Cooldown
-                    ultimo_registro = historico_registro.get(colaborador_id, 0.0)
-                    
-                    if (agora - ultimo_registro) > COOLDOWN_REGISTRO:
-                        logger.info("🎯 [ROSTO RECONHECIDO] Enviando validação para o Node.js para o ID: %s", colaborador_id)
-                        historico_registro[colaborador_id] = agora
+                    if colaborador_id:
+                        ultimo_registro = historico_registro.get(colaborador_id, 0.0)
                         
-                        # 📡 Conexão com o Back-end utilizando o Token de Máquina (M2M) do seu middleware
-                        try:
-                            payload = {"colaborador_id": colaborador_id}
-                            headers = {"Authorization": "Bearer 1010-ACCESSPIM"}
+                        # Evita "Double-Tap" (vários registros num espaço de 8 segundos)
+                        if (agora - ultimo_registro) > COOLDOWN_REGISTRO and estado_catraca == "ESPERA":
+                            historico_registro[colaborador_id] = agora
+                            timestamp_estado = agora
                             
-                            # Rota do endpoint centralizador de acessos do Node
-                            resposta = requests.post(f"{URL_BACKEND}/api/colaboradores/registro-acesso", json=payload, headers=headers, timeout=3)
-                            
-                            if resposta.status_code == 201 or resposta.status_code == 200:
-                                logger.info("🔓 [NODE RESPONSE] Acesso Autorizado!")
-                                catraca_liberada = True
-                                timestamp_liberacao = time.time()
-                            else:
-                                logger.warning("🔒 [NODE RESPONSE] Acesso Bloqueado pelas Regras de Negócio do Back-end.")
+                            # Preparando o POST para o Node.js
+                            try:
+                                payload = {
+                                    "colaborador_id": str(colaborador_id), 
+                                    "area_id": AREA_ID_ALVO, 
+                                    "tipo": "ENTRADA",
+                                    "autorizado": True,
+                                    "observacao": f"Acesso via Biometria (Dist: {int(confianca)})"
+                                }
                                 
-                        except requests.exceptions.RequestException as e:
-                            logger.error("🚨 Falha ao conectar na API do Node.js (Servidor Offline): %s", e)
+                                headers = {
+                                    "Authorization": "Bearer 1010-ACCESSPIM"
+                                }
+                                
+                                endpoint_registro = f"{URL_BACKEND}/registro"
+                                resposta = requests.post(endpoint_registro, json=payload, headers=headers, timeout=4)
+                                
+                                if resposta.status_code in [200, 201]:
+                                    estado_catraca = "LIBERADA"
+                                    nome_usuario_detectado = "ACESSO REGISTRADO"
+                                    logger.info(f"[✅] Sucesso: Acesso do ID {colaborador_id} gravado na nuvem.")
+                                else:
+                                    estado_catraca = "BLOQUEADA"
+                                    nome_usuario_detectado = "ACESSO NEGADO"
+                                    logger.warning(f"[⚠️] Entrada recusada pelo Node.js. Status: {resposta.status_code}")
+                                    
+                            except requests.exceptions.RequestException as e:
+                                estado_catraca = "BLOQUEADA"
+                                nome_usuario_detectado = "ERRO DE REDE"
+                                logger.error(f"[❌] Falha de comunicação com o servidor. Erro: {e}")
 
-            cv2.rectangle(frame, (x, y), (x+w, y+h), cor_moldura, 2)
-            cv2.putText(frame, f"{nome_exibicao} ({int(confianca)})", (x, y-10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, cor_moldura, 2)
+                # Altera a cor do quadrado no rosto de acordo com a catraca
+                if estado_catraca == "LIBERADA":
+                    cor_moldura = (0, 255, 0) # Verde
+                elif estado_catraca == "BLOQUEADA":
+                    cor_moldura = (0, 0, 255) # Vermelho
 
-        # 🎨 RENDERIZAÇÃO DA COBERTURA VISUAL DA CATRACA NO OPENCV
-        if catraca_liberada:
-            # Barra Verde Indicativa de Acesso Liberado
-            cv2.rectangle(frame, (0, 0), (frame.shape[1], 45), (0, 255, 0), -1)
-            cv2.putText(frame, "🔓 TRANCA LIBERADA - COLOQUE O EPI E PASSE", (15, 30), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
-        else:
-            # Barra Vermelha de Catraca Bloqueada / Standby
-            cv2.rectangle(frame, (0, 0), (frame.shape[1], 45), (0, 0, 255), -1)
-            cv2.putText(frame, "🔒 CATRACA BLOQUEADA - AGUARDANDO BIOMETRIA", (15, 30), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.rectangle(camera_frame, (x, y), (x+w, y+h), cor_moldura, 2)
 
-        # Renderiza a janela do terminal de monitoramento local
-        cv2.imshow("AccessPIM AI - Loop de Reconhecimento", frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        
-except KeyboardInterrupt:
-    logger.info("Encerrando scanner passivo...")
+            # ---------------------------------------------------------------------------
+            # 5. CONSTRUÇÃO DO PAINEL VISUAL DA CATRACA (Interface do Totem)
+            # ---------------------------------------------------------------------------
+            painel_fisico = np.zeros((180, 400, 3), dtype=np.uint8)
+            
+            if estado_catraca == "ESPERA":
+                cv2.rectangle(painel_fisico, (10, 10), (390, 170), (130, 50, 0), -1) 
+                cv2.putText(painel_fisico, "[ APARELHO PRONTO ]", (95, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.putText(painel_fisico, "APRESENTE SUA BIOMETRIA", (70, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
+                cv2.putText(painel_fisico, "STATUS: TRANCA ATIVA", (90, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 165, 255), 1)
 
-finally:
-    cap.release()
-    cv2.destroyAllWindows()
+            elif estado_catraca == "LIBERADA":
+                cv2.rectangle(painel_fisico, (10, 10), (390, 170), (0, 120, 0), -1) 
+                cv2.putText(painel_fisico, ">>> ACESSO PERMITIDO <<<", (65, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.putText(painel_fisico, "CATRACA LIBERADA", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                seta = "---> --->" if int(time.time() * 2) % 2 == 0 else " ---> ---> "
+                cv2.putText(painel_fisico, seta, (140, 145), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+            elif estado_catraca == "BLOQUEADA":
+                cv2.rectangle(painel_fisico, (10, 10), (390, 170), (0, 0, 150), -1) 
+                cv2.putText(painel_fisico, "X    ACESSO BLOQUEADO    X", (60, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.putText(painel_fisico, nome_usuario_detectado, (115, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(painel_fisico, "CONSULTE A PORTARIA", (100, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
+
+            # Junta o vídeo da câmera (topo) com o painel físico da catraca (base)
+            totem_completo = np.vstack((camera_frame, painel_fisico))
+
+            cv2.imshow("AccessPIM AI - Simulador de Catraca", totem_completo)
+            
+            # ESC ou 'q' para sair
+            tecla = cv2.waitKey(1) & 0xFF
+            if tecla == ord('q') or tecla == 27:
+                logger.info("Encerrando por comando do operador.")
+                break
+            
+    except KeyboardInterrupt:
+        logger.info("Encerrando simulador (Ctrl+C)...")
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()

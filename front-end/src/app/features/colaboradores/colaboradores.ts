@@ -227,18 +227,26 @@ export class Colaboradores implements OnInit {
     if (confirm('Iniciar o cadastro facial para este colaborador? Certifique-se de que ele esteja posicionado corretamente na catraca.')) {
       this.colaboradorService.iniciarCadastroFacial(colaboradorId).subscribe({
         next: (response) => alert (`Automação de Borda Iniciada: ${response.message}`),
-        error: (err) => alert(`Falha de Comunicação: ${err.error?.message || 'Catraca offline'}`)
+        error: (err) => alert(`Falha de Comunicação: ${err.error?.message || err.message }`)
       });
     }
   }
 
-  testarLeitorFacial(id: string) {
-    this.colaboradorService.iniciarReconhecimentoManual(id).subscribe({
-      next: (response) => alert(`Comando de varredura manual enviado. Oleitor processará a resposta em instantes`),
-      error: (err) => alert(`Falha: ${err.error?.message}`)
-    });
+  ligarCatraca(): void {
+    if (confirm('Deseja ativar o monitoramento da Catraca Facial? Ela ficará aperante para todos os colaboradores.')){
+      this.colaboradorService.iniciarReconhecimentoManual().subscribe({
+        next: (response) => alert(`${response.message}`),
+        error: (err) => alert(`Falha: ${err.error?.message || err.message }`)
+      });
+    }
   }
 
+  desligarCatraca(): void {
+    this.colaboradorService.desligarReconhecimento().subscribe({
+      next: (response) => alert(`${response.message}`),
+      error: (err) => alert(`Falha: ${err.error?.message || err.message}`)
+    });
+  }
   removerBiometriaFacial(id: string){
     if (confirm(`ATENÇÃO: Esta ação removerá permanentemente as assinaturas biométricas armazenadas na catraca local, em estrita conformidade com a LGPD. Deseja expurgar os dados?`)){
       this.colaboradorService.excluirBiometriaFacial(id).subscribe({
