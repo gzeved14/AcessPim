@@ -12,9 +12,10 @@ const app = express();
 app.set('trust proxy', 1); 
 
 // 1. Logs de Requisição (Para você ver tudo o que chega no terminal)
+// Adicione isto logo após o app.use(express.json())
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
+    console.log(`[DEBUG] Recebido: ${req.method} ${req.path} com body:`, JSON.stringify(req.body));
+    next();
 });
 
 // 2. Segurança e CORS (Configuração Oficial para Deploy)
