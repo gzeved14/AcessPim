@@ -32,6 +32,7 @@ logs/
 # IDEs
 .vscode/
 .idea/
+.opencode/
 
 # OS
 .DS_Store
