@@ -34,7 +34,7 @@ pnpm-debug.log*
 .history/*
 
 # Miscellaneous
-/.angular/cache
+/.angular/
 .sass-cache/
 /.cache
 /.eslintcache
